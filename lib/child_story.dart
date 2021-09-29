@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
 import 'package:intl/intl.dart';
+import 'dart:math';
 
 class ChildStory extends StatefulWidget {
   const ChildStory({Key? key}) : super(key: key);
@@ -17,12 +18,37 @@ class _ChildStoryState extends State<ChildStory> {
     });
   }
 
+  Widget _buildEventButton(
+      {backgroundColor: Color,
+      icon: Icon,
+      iconColor: Color,
+      onPressed: Function}) {
+    return SizedBox(
+      child: Ink(
+        width: 75,
+        height: 75,
+        decoration: ShapeDecoration(
+          shape: CircleBorder(),
+          color: backgroundColor,
+        ),
+        child: IconButton(
+            color: iconColor,
+            onPressed: onPressed,
+            icon: Icon(
+              icon,
+              size: 48,
+            )),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     List<StoryEvent> events = story.getEvents();
     bool duringSleep = false;
 
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Expanded(
             flex: 3,
@@ -33,10 +59,10 @@ class _ChildStoryState extends State<ChildStory> {
                   connectionDirection: ConnectionDirection.after,
                   contentsAlign: ContentsAlign.basic,
                   contentsBuilder: (context, index) => Align(
-                      alignment: AlignmentDirectional.topCenter,
+                      alignment: AlignmentDirectional.topStart,
                       child: Text(events[index].getDescription())),
                   oppositeContentsBuilder: (context, index) => Align(
-                      alignment: AlignmentDirectional.topCenter,
+                      alignment: AlignmentDirectional.topEnd,
                       child: Text(events[index].getFormattedTime())),
                   // nodePositionBuilder: (context, index) => 0.4,
                   // indicatorPositionBuilder: (context, index) => 0.0,
@@ -56,67 +82,58 @@ class _ChildStoryState extends State<ChildStory> {
                   },
                   itemExtentBuilder: (context, index) {
                     const double base = 30;
-                    print('$index ${events.length}');
                     if (index == events.length - 1) return base;
 
                     DateTime curTime = events[index].getLocalTime();
                     DateTime prevTime = events[index + 1].getLocalTime();
-                    Duration diff = curTime.difference(prevTime);
-                    return base + diff.inMinutes;
+                    int diff = curTime.difference(prevTime).inMinutes;
+                    double scaled = min((diff == 0 ? 1 : diff) / 2, 250);
+                    return base + scaled;
                   },
                   indicatorPositionBuilder: (context, index) => 0,
                   indicatorBuilder: (context, index) {
                     EventType type = events[index].getEventType();
-                    return type == EventType.started_sleeping ||
-                            type == EventType.ended_sleeping
-                        ? DotIndicator(
-                            color: Colors.green,
-                          )
-                        : DotIndicator(
-                            color: Colors.blue,
-                          );
+                    return DotIndicator(
+                      color: type.iconColor,
+                    );
                   },
                   itemCount: events.length,
                 ),
               ),
             )),
-        Expanded(
-          flex: 2,
-          child: Material(
-            color: Colors.teal[50],
-            child: GridView.count(
-              crossAxisCount: 4,
-              crossAxisSpacing: 15,
-              padding: EdgeInsets.all(16.0),
+        // Divider(
+        //   color: Colors.teal[200],
+        //   thickness: 3,
+        //   height: 3,
+        // ),
+        Material(
+          color: Colors.teal[300],
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Wrap(
+              spacing: 20,
+              runSpacing: 20,
               children: [
-                Ink(
-                  decoration: ShapeDecoration(
-                    shape: CircleBorder(),
-                    color: Colors.green[50],
-                  ),
-                  child: IconButton(
-                      color: Colors.green,
-                      onPressed: () => _addEvent(story.isSleeping()
-                          ? EventType.ended_sleeping
-                          : EventType.started_sleeping),
-                      icon: Icon(
-                        Icons.crib,
-                        size: 48,
-                      )),
+                _buildEventButton(
+                  backgroundColor: Colors.green[50],
+                  icon: Icons.crib,
+                  iconColor: Colors.green,
+                  onPressed: () => _addEvent(story.isSleeping()
+                      ? EventType.ended_sleeping
+                      : EventType.started_sleeping),
                 ),
-                Ink(
-                  decoration: ShapeDecoration(
-                    shape: CircleBorder(),
-                    color: Colors.red[50],
-                  ),
-                  child: IconButton(
-                      color: Colors.red,
-                      onPressed: () => _addEvent(EventType.diaper),
-                      icon: Icon(
-                        Icons.baby_changing_station,
-                        size: 48,
-                      )),
-                )
+                _buildEventButton(
+                  backgroundColor: Colors.red[50],
+                  icon: Icons.baby_changing_station,
+                  iconColor: Colors.red,
+                  onPressed: () => _addEvent(EventType.diaper),
+                ),
+                _buildEventButton(
+                  backgroundColor: Colors.orange[50],
+                  icon: Icons.restaurant,
+                  iconColor: Colors.orange,
+                  onPressed: () => _addEvent(EventType.feeding),
+                ),
               ],
             ),
           ),
@@ -128,10 +145,10 @@ class _ChildStoryState extends State<ChildStory> {
 
 class StoryData {
   List<StoryEvent> _events = [
-    StoryEvent.withTime(
-        EventType.diaper, DateTime.now().subtract(Duration(hours: 3))),
+    StoryEvent.withTime(EventType.started_sleeping,
+        DateTime.now().subtract(Duration(hours: 3))),
   ];
-  bool _isSleeping = false;
+  bool _isSleeping = true;
 
   List<StoryEvent> getEvents() => _events;
   void addEvent(EventType type) {
@@ -147,6 +164,7 @@ enum EventType {
   diaper,
   started_sleeping,
   ended_sleeping,
+  feeding,
 }
 
 extension Event on EventType {
@@ -158,8 +176,55 @@ extension Event on EventType {
         return 'Started sleeping';
       case EventType.ended_sleeping:
         return 'Woke up';
+      case EventType.feeding:
+        return 'Ate';
       default:
         return '';
+    }
+  }
+
+  Color get iconColor {
+    switch (this) {
+      case EventType.diaper:
+        return Colors.red;
+      case EventType.started_sleeping:
+        return Colors.green;
+      case EventType.ended_sleeping:
+        return Colors.green;
+      case EventType.feeding:
+        return Colors.orange;
+      default:
+        return Colors.transparent;
+    }
+  }
+
+  Color get backgroundColor {
+    switch (this) {
+      case EventType.diaper:
+        return Colors.red.shade50;
+      case EventType.started_sleeping:
+        return Colors.green.shade50;
+      case EventType.ended_sleeping:
+        return Colors.green.shade50;
+      case EventType.feeding:
+        return Colors.orange.shade50;
+      default:
+        return Colors.transparent;
+    }
+  }
+
+  IconData get icon {
+    switch (this) {
+      case EventType.diaper:
+        return Icons.baby_changing_station;
+      case EventType.started_sleeping:
+        return Icons.crib;
+      case EventType.ended_sleeping:
+        return Icons.crib;
+      case EventType.feeding:
+        return Icons.restaurant;
+      default:
+        return Icons.close;
     }
   }
 }
