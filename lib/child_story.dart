@@ -3,6 +3,86 @@ import 'package:timelines/timelines.dart';
 import 'package:intl/intl.dart';
 import 'dart:math';
 
+class EventButton extends StatelessWidget {
+  const EventButton({
+    Key? key,
+    required this.size,
+    required this.backgroundColor,
+    required this.icon,
+    required this.iconColor,
+    required this.onPressed,
+  }) : super(key: key);
+  final double size;
+  final Color backgroundColor;
+  final IconData icon;
+  final Color iconColor;
+  final Function onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return RawMaterialButton(
+      elevation: 3,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      fillColor: backgroundColor,
+      onPressed: () {
+        // onPressed();
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => AlertDialog(
+                  title: const Text('AlertDialog Title'),
+                  content: const Text('AlertDialog description'),
+                  actions: <Widget>[
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'Cancel'),
+                      child: const Text('Cancel'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.pop(context, 'OK'),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ));
+      },
+      child: Icon(
+        icon,
+        size: size / 1.5,
+        color: iconColor,
+      ),
+    );
+  }
+}
+
+// class EvtButton extends StatefulWidget {
+//   final Color backgroundColor;
+//   final IconData icon;
+//   final Color iconColor;
+//   final void Function() onPressed;
+//   const EvtButton({
+//     Key? key,
+//     required this.backgroundColor,
+//     required this.icon,
+//     required this.iconColor,
+//     required this.onPressed,
+//   }) : super(key: key);
+
+//   @override
+//   _EvtButtonState createState() => _EvtButtonState();
+// }
+
+// class _EvtButtonState extends State<EvtButton> {
+//   double _height = 75;
+//   void _grow() {
+//     setState(() {
+//       _height += 15;
+//     });
+//   }
+
+//   @override
+//   Widget build(BuildContext context) {}
+// }
+
 class ChildStory extends StatefulWidget {
   const ChildStory({Key? key}) : super(key: key);
 
@@ -18,29 +98,7 @@ class _ChildStoryState extends State<ChildStory> {
     });
   }
 
-  Widget _buildEventButton(
-      {backgroundColor: Color,
-      icon: Icon,
-      iconColor: Color,
-      onPressed: Function}) {
-    return SizedBox(
-      child: Ink(
-        width: 75,
-        height: 75,
-        decoration: ShapeDecoration(
-          shape: CircleBorder(),
-          color: backgroundColor,
-        ),
-        child: IconButton(
-            color: iconColor,
-            onPressed: onPressed,
-            icon: Icon(
-              icon,
-              size: 48,
-            )),
-      ),
-    );
-  }
+  bool clicked = false;
 
   @override
   Widget build(BuildContext context) {
@@ -101,44 +159,72 @@ class _ChildStoryState extends State<ChildStory> {
                 ),
               ),
             )),
-        // Divider(
-        //   color: Colors.teal[200],
-        //   thickness: 3,
-        //   height: 3,
-        // ),
-        Material(
-          color: Colors.teal[300],
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Wrap(
-              spacing: 20,
-              runSpacing: 20,
-              children: [
-                _buildEventButton(
-                  backgroundColor: Colors.green[50],
-                  icon: Icons.crib,
-                  iconColor: Colors.green,
-                  onPressed: () => _addEvent(story.isSleeping()
-                      ? EventType.ended_sleeping
-                      : EventType.started_sleeping),
-                ),
-                _buildEventButton(
-                  backgroundColor: Colors.red[50],
-                  icon: Icons.baby_changing_station,
-                  iconColor: Colors.red,
-                  onPressed: () => _addEvent(EventType.diaper),
-                ),
-                _buildEventButton(
-                  backgroundColor: Colors.orange[50],
-                  icon: Icons.restaurant,
-                  iconColor: Colors.orange,
-                  onPressed: () => _addEvent(EventType.feeding),
-                ),
-              ],
-            ),
+        AddEventButtons(isSleeping: story.isSleeping(), addEvent: _addEvent),
+      ],
+    );
+  }
+}
+
+class AddEventButtons extends StatefulWidget {
+  const AddEventButtons(
+      {Key? key, required this.isSleeping, required this.addEvent})
+      : super(key: key);
+  final bool isSleeping;
+  final Function addEvent;
+
+  @override
+  _AddEventButtonsState createState() => _AddEventButtonsState();
+}
+
+class _AddEventButtonsState extends State<AddEventButtons> {
+  bool clicked = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      flex: 1,
+      child: Material(
+        color: Colors.teal[300],
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 20,
+            runSpacing: 20,
+            children: [
+              EventButton(
+                size: 75,
+                backgroundColor: EventType.ended_sleeping.backgroundColor,
+                icon: EventType.ended_sleeping.icon,
+                iconColor: EventType.ended_sleeping.iconColor,
+                onPressed: () => widget.addEvent(widget.isSleeping
+                    ? EventType.ended_sleeping
+                    : EventType.started_sleeping),
+              ),
+              EventButton(
+                size: 75,
+                backgroundColor: EventType.diaper.backgroundColor,
+                icon: EventType.diaper.icon,
+                iconColor: EventType.diaper.iconColor,
+                onPressed: () {
+                  setState(() {
+                    widget.addEvent(EventType.diaper);
+                    clicked = true;
+                  });
+                },
+              ),
+              EventButton(
+                size: 75,
+                backgroundColor: EventType.feeding.backgroundColor,
+                icon: EventType.feeding.icon,
+                iconColor: EventType.feeding.iconColor,
+                onPressed: () => widget.addEvent(EventType.feeding),
+              ),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 }
