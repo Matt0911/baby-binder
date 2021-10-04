@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
-import 'story_events.dart';
+import 'events/story_events.dart';
+import 'events/sleep_events.dart';
+import 'events/diaper_event.dart';
+import 'events/feeding_event.dart';
 
 class EventButton extends StatelessWidget {
   const EventButton({
@@ -22,29 +25,12 @@ class EventButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return RawMaterialButton(
       elevation: 3,
+      constraints: BoxConstraints(minWidth: size + 8, minHeight: size + 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(20),
       ),
       fillColor: backgroundColor,
-      onPressed: () {
-        // onPressed();
-        showDialog(
-            context: context,
-            builder: (BuildContext context) => AlertDialog(
-                  title: const Text('AlertDialog Title'),
-                  content: const Text('AlertDialog description'),
-                  actions: <Widget>[
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'Cancel'),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context, 'OK'),
-                      child: const Text('OK'),
-                    ),
-                  ],
-                ));
-      },
+      onPressed: () => onPressed(),
       child: Icon(
         icon,
         size: size / 1.5,
@@ -63,10 +49,27 @@ class ChildStory extends StatefulWidget {
 
 class _ChildStoryState extends State<ChildStory> {
   StoryData story = StoryData();
-  void _addEvent(EventType type) {
-    setState(() {
-      story.addEvent(type);
-    });
+  void _addEvent(StoryEvent event) async {
+    if (event.requiresDialog()) {
+      List results = await showDialog(
+        context: context,
+        builder: (BuildContext context) => event.buildAddDialog(),
+        barrierDismissible: false,
+      );
+      bool didSave = results[0];
+      if (didSave) {
+        setState(() {
+          print('data from dialog: ${results[1]}');
+          story.addEvent(event);
+        });
+      } else {
+        print('user cancelled');
+      }
+    } else {
+      setState(() {
+        story.addEvent(event);
+      });
+    }
   }
 
   bool clicked = false;
@@ -82,7 +85,7 @@ class _ChildStoryState extends State<ChildStory> {
         Expanded(
             flex: 3,
             child: Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
               child: Timeline.tileBuilder(
                 builder: TimelineTileBuilder.connected(
                   connectionDirection: ConnectionDirection.after,
@@ -141,7 +144,7 @@ class AddEventButtons extends StatefulWidget {
       {Key? key, required this.isSleeping, required this.addEvent})
       : super(key: key);
   final bool isSleeping;
-  final Function addEvent;
+  final Function(StoryEvent) addEvent;
 
   @override
   _AddEventButtonsState createState() => _AddEventButtonsState();
@@ -152,48 +155,44 @@ class _AddEventButtonsState extends State<AddEventButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
-      child: Material(
-        color: Colors.teal[300],
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 20,
-            runSpacing: 20,
-            children: [
-              EventButton(
-                size: 75,
-                backgroundColor: EventType.ended_sleeping.backgroundColor,
-                icon: EventType.ended_sleeping.icon,
-                iconColor: EventType.ended_sleeping.iconColor,
-                onPressed: () => widget.addEvent(widget.isSleeping
-                    ? EventType.ended_sleeping
-                    : EventType.started_sleeping),
-              ),
-              EventButton(
-                size: 75,
-                backgroundColor: EventType.diaper.backgroundColor,
-                icon: EventType.diaper.icon,
-                iconColor: EventType.diaper.iconColor,
-                onPressed: () {
-                  setState(() {
-                    widget.addEvent(EventType.diaper);
-                    clicked = true;
-                  });
-                },
-              ),
-              EventButton(
-                size: 75,
-                backgroundColor: EventType.feeding.backgroundColor,
-                icon: EventType.feeding.icon,
-                iconColor: EventType.feeding.iconColor,
-                onPressed: () => widget.addEvent(EventType.feeding),
-              ),
-            ],
-          ),
+    return Material(
+      color: Colors.teal[300],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 20,
+          runSpacing: 20,
+          children: [
+            EventButton(
+              size: 60,
+              backgroundColor: EventType.ended_sleeping.backgroundColor,
+              icon: EventType.ended_sleeping.icon,
+              iconColor: EventType.ended_sleeping.iconColor,
+              onPressed: () => widget.addEvent(
+                  widget.isSleeping ? EndSleepEvent() : StartSleepEvent()),
+            ),
+            EventButton(
+              size: 60,
+              backgroundColor: EventType.diaper.backgroundColor,
+              icon: EventType.diaper.icon,
+              iconColor: EventType.diaper.iconColor,
+              onPressed: () {
+                setState(() {
+                  widget.addEvent(DiaperEvent());
+                  clicked = true;
+                });
+              },
+            ),
+            EventButton(
+              size: 60,
+              backgroundColor: EventType.feeding.backgroundColor,
+              icon: EventType.feeding.icon,
+              iconColor: EventType.feeding.iconColor,
+              onPressed: () => widget.addEvent(FeedingEvent()),
+            ),
+          ],
         ),
       ),
     );
@@ -202,14 +201,16 @@ class _AddEventButtonsState extends State<AddEventButtons> {
 
 class StoryData {
   List<StoryEvent> _events = [
-    StoryEvent.withTime(EventType.started_sleeping,
-        DateTime.now().subtract(Duration(hours: 3))),
+    StartSleepEvent.withTime(
+      eventTime: DateTime.now().subtract(Duration(hours: 3)),
+    ),
   ];
   bool _isSleeping = true;
 
   List<StoryEvent> getEvents() => _events;
-  void addEvent(EventType type) {
-    _events.insert(0, StoryEvent(type));
+  void addEvent(StoryEvent event) {
+    _events.insert(0, event);
+    EventType type = event.getEventType();
     if (type == EventType.started_sleeping) _isSleeping = true;
     if (type == EventType.ended_sleeping) _isSleeping = false;
   }
