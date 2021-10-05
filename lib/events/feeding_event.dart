@@ -8,7 +8,7 @@ class FeedingDialogContent extends StatelessWidget {
     required this.eventData,
     required this.updateEventData,
   }) : super(key: key);
-  final Map<String, dynamic> eventData;
+  final Map eventData;
   final Function updateEventData;
 
   @override
@@ -17,8 +17,7 @@ class FeedingDialogContent extends StatelessWidget {
   }
 }
 
-Widget _buildFeedingDialogContent(
-    Map<String, dynamic> eventData, Function updateEventData) {
+Widget _buildFeedingDialogContent(Map eventData, Function updateEventData) {
   return FeedingDialogContent(
     eventData: eventData,
     updateEventData: updateEventData,

@@ -5,16 +5,16 @@ class AddEventDialog extends StatefulWidget {
       : super(key: key);
 
   final String title;
-  final Widget Function(Map<String, dynamic>, Function) content;
+  final Widget Function(Map, Function) content;
 
   @override
   _AddEventDialogState createState() => _AddEventDialogState();
 }
 
 class _AddEventDialogState extends State<AddEventDialog> {
-  Map<String, dynamic> eventData = {};
+  Map eventData = {};
 
-  _updateEventData(Map<String, dynamic> data) {
+  _updateEventData(Map data) {
     setState(() {
       eventData.addAll(data);
     });
