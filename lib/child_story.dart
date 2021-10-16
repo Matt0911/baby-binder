@@ -51,10 +51,22 @@ class _ChildStoryState extends State<ChildStory> {
   StoryData story = StoryData();
   void _addEvent(StoryEvent event) async {
     if (event.requiresDialog()) {
-      List results = await showDialog(
+      List results = await showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: false,
+        enableDrag: false,
         context: context,
-        builder: (BuildContext context) => event.buildAddDialog(),
-        barrierDismissible: false,
+        builder: (BuildContext context) => SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.all(10)
+                .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              height: 300,
+              child: event.buildAddDialog(),
+            ),
+          ),
+        ),
       );
       bool didSave = results[0];
       if (didSave) {

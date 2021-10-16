@@ -52,8 +52,16 @@ class DiaperDialogContent extends StatelessWidget {
             ),
           ],
         ),
-        TextField(
-          onChanged: (note) => updateEventData({'note': note}),
+        Row(
+          children: [
+            Text('Notes'),
+            SizedBox(width: 20),
+            Expanded(
+              child: TextField(
+                onChanged: (note) => updateEventData({'note': note}),
+              ),
+            ),
+          ],
         )
       ],
     );

@@ -22,18 +22,31 @@ class _AddEventDialogState extends State<AddEventDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text(widget.title),
-      content: widget.content(eventData, _updateEventData),
-      actions: <Widget>[
-        TextButton(
-          onPressed: () => Navigator.pop(context, [false]),
-          child: const Text('Cancel'),
+    return Column(
+      children: [
+        Text(
+          widget.title,
+          style: TextStyle(
+            color: Colors.teal,
+            fontWeight: FontWeight.bold,
+            fontSize: 25,
+          ),
         ),
-        TextButton(
-          onPressed: () => Navigator.pop(context, [true, eventData]),
-          child: const Text('Add'),
-        ),
+        SizedBox(height: 20),
+        widget.content(eventData, _updateEventData),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, [false]),
+              child: const Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () => Navigator.pop(context, [true, eventData]),
+              child: const Text('Add'),
+            ),
+          ],
+        )
       ],
     );
   }
