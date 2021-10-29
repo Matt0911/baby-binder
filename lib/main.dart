@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'screens/child_settings_page.dart';
-import 'screens/child_story.dart';
+import 'screens/child_story_page.dart';
 
 void main() {
   runApp(BabyBinder());

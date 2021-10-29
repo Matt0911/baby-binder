@@ -1,3 +1,4 @@
+import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
@@ -14,15 +15,8 @@ class ChildStoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          padding: const EdgeInsets.all(0),
-          alignment: Alignment.center,
-          icon: Icon(Icons.menu),
-          onPressed: () => {},
-        ),
-        title: const Text('Baby Binder'),
-      ),
+      appBar: AppBar(title: const Text('Baby Binder')),
+      drawer: BabyBinderDrawer(),
       body: ChildStory(),
     );
   }
