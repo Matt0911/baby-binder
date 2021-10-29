@@ -1,10 +1,32 @@
 import 'package:flutter/material.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
-import 'events/story_events.dart';
-import 'events/sleep_events.dart';
-import 'events/diaper_event.dart';
-import 'events/feeding_event.dart';
+import '../events/story_events.dart';
+import '../events/sleep_events.dart';
+import '../events/diaper_event.dart';
+import '../events/feeding/feeding_event.dart';
+
+class ChildStoryPage extends StatelessWidget {
+  static final routeName = '/child-story';
+
+  const ChildStoryPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          padding: const EdgeInsets.all(0),
+          alignment: Alignment.center,
+          icon: Icon(Icons.menu),
+          onPressed: () => {},
+        ),
+        title: const Text('Baby Binder'),
+      ),
+      body: ChildStory(),
+    );
+  }
+}
 
 class EventButton extends StatelessWidget {
   const EventButton({
@@ -62,7 +84,7 @@ class _ChildStoryState extends State<ChildStory> {
                 .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
             child: Container(
               width: MediaQuery.of(context).size.width,
-              height: 300,
+              height: 400,
               child: event.buildAddDialog(),
             ),
           ),

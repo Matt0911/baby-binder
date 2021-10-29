@@ -1,6 +1,9 @@
+import 'package:baby_binder/screens/child_story.dart';
 import 'package:flutter/material.dart';
 
 class ChildSettingsPage extends StatelessWidget {
+  static final String routeName = '/settings-page';
+
   @override
   Widget build(BuildContext context) {
     Widget avatar = Expanded(
@@ -66,7 +69,6 @@ class ChildSettingsPage extends StatelessWidget {
           _buildSettingRow('setting name 2', 'value 2')
         ]));
 
-    void _goToStory() {}
     Widget buttonSection = Container(
         alignment: Alignment.center,
         child: OutlinedButton(
@@ -76,17 +78,32 @@ class ChildSettingsPage extends StatelessWidget {
                 'View Story',
                 style: TextStyle(fontSize: 20),
               )),
-          onPressed: _goToStory,
+          onPressed: () =>
+              Navigator.pushNamed(context, ChildStoryPage.routeName),
         ));
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Column(
-        children: [
-          avatar,
-          settingsSection,
-          buttonSection,
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+          padding: const EdgeInsets.all(0),
+          alignment: Alignment.center,
+          icon: Icon(Icons.menu),
+          // color: Colors.red[500],
+          onPressed: () => {},
+          // enableFeedback: false,
+        ),
+        title: const Text('Baby Binder'),
+      ),
+      // body: ChildSettingsPage(),
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Column(
+          children: [
+            avatar,
+            settingsSection,
+            buttonSection,
+          ],
+        ),
       ),
     );
   }
