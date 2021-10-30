@@ -1,8 +1,10 @@
 import 'package:baby_binder/constants.dart';
+import 'package:baby_binder/models/child_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'child_avatar.dart';
 
@@ -20,8 +22,12 @@ class BabyBinderDrawer extends StatelessWidget {
           DrawerHeader(
             child: Column(
               children: [
-                ChildAvatar(
-                  maxRadius: 25,
+                Consumer<ChildData>(
+                  builder: (_, child, __) => ChildAvatar(
+                    imageUrl: child.image,
+                    name: child.name,
+                    maxRadius: 25,
+                  ),
                 ),
                 TextButton.icon(
                   onPressed: () => Navigator.pushNamed(

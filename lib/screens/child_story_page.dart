@@ -1,5 +1,7 @@
+import 'package:baby_binder/models/child_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
 import '../events/story_events.dart';
@@ -14,10 +16,13 @@ class ChildStoryPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Baby Binder')),
-      drawer: BabyBinderDrawer(),
-      body: ChildStory(),
+    return Selector<ChildData, String>(
+      selector: (_, childData) => childData.name,
+      builder: (_, name, __) => Scaffold(
+        appBar: AppBar(title: Text('$name\'s Story')),
+        drawer: BabyBinderDrawer(),
+        body: ChildStory(),
+      ),
     );
   }
 }

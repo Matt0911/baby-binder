@@ -4,10 +4,14 @@ import 'package:flutter/material.dart';
 class ChildAvatar extends StatelessWidget {
   const ChildAvatar({
     Key? key,
+    required this.imageUrl,
+    required this.name,
     this.maxRadius = 80,
   }) : super(key: key);
 
   final double maxRadius;
+  final String imageUrl;
+  final String name;
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +21,14 @@ class ChildAvatar extends StatelessWidget {
         // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
-            backgroundImage: AssetImage(
-              'images/baby.jpg',
-            ),
+            backgroundImage: AssetImage(imageUrl),
             minRadius: 25,
             maxRadius: maxRadius,
           ),
           Container(
             padding: const EdgeInsets.only(top: 8, bottom: 8),
             child: Text(
-              'Elliott',
+              name,
               style: TextStyle(fontSize: 20, color: kGreyTextColor),
             ),
           )

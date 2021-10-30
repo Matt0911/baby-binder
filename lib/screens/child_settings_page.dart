@@ -1,7 +1,9 @@
+import 'package:baby_binder/models/child_data.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChildSettingsPage extends StatelessWidget {
   static final String routeName = '/child-settings-page';
@@ -37,7 +39,11 @@ class ChildSettingsPage extends StatelessWidget {
           children: [
             Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ChildAvatar(),
+              child: Consumer<ChildData>(
+                  builder: (_, childData, __) => ChildAvatar(
+                        imageUrl: childData.image,
+                        name: childData.name,
+                      )),
             ),
             Expanded(
                 flex: 1,
