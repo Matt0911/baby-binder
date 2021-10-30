@@ -1,4 +1,5 @@
 import 'package:baby_binder/constants.dart';
+import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:flutter/material.dart';
@@ -23,7 +24,8 @@ class BabyBinderDrawer extends StatelessWidget {
                   maxRadius: 25,
                 ),
                 TextButton.icon(
-                  onPressed: () => print('go to child selection page'),
+                  onPressed: () => Navigator.pushNamed(
+                      context, ChildSelectionPage.routeName),
                   icon: Icon(
                     Icons.switch_account_outlined,
                     size: 16,

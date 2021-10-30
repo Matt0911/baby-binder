@@ -4,7 +4,7 @@ import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:flutter/material.dart';
 
 class ChildSettingsPage extends StatelessWidget {
-  static final String routeName = '/settings-page';
+  static final String routeName = '/child-settings-page';
 
   Widget _buildSettingRow(String name, String value) {
     const double fontSize = 18;
