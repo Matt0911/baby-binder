@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.baby_binder">
+    package="com.mattmanhardt.baby_binder">
    <application
         android:label="baby_binder"
         android:icon="@mipmap/ic_launcher">

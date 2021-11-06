@@ -1,4 +1,4 @@
-package com.example.baby_binder
+package com.mattmanhardt.baby_binder
 
 import io.flutter.embedding.android.FlutterActivity
 
