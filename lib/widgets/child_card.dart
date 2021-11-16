@@ -7,7 +7,7 @@ import 'child_avatar.dart';
 
 class ChildCard extends StatelessWidget {
   const ChildCard({Key? key, required this.childData}) : super(key: key);
-  final ChildData childData;
+  final Child childData;
 
   @override
   Widget build(BuildContext context) {

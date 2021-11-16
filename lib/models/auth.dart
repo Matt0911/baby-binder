@@ -1,3 +1,5 @@
+import 'package:baby_binder/constants.dart';
+import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/widgets/fb_widgets.dart';
 import 'package:flutter/material.dart';
 
@@ -8,6 +10,20 @@ enum ApplicationLoginState {
   password,
   loggedIn,
 }
+
+const kInputDecoration = InputDecoration(
+  filled: true,
+  fillColor: Colors.white,
+  border: UnderlineInputBorder(
+    borderSide: const BorderSide(color: Colors.white),
+    borderRadius: BorderRadius.all(Radius.circular(25.7)),
+  ),
+  errorStyle: TextStyle(fontSize: 14, color: Colors.white),
+);
+
+final kButtonStyle = ButtonStyle(
+  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF4DB6AC)),
+);
 
 class Authentication extends StatelessWidget {
   const Authentication({
@@ -29,36 +45,25 @@ class Authentication extends StatelessWidget {
     void Function(Exception e) error,
   ) verifyEmail;
   final void Function(
+    BuildContext context,
     String email,
     String password,
+    void Function() success,
     void Function(Exception e) error,
   ) signInWithEmailAndPassword;
   final void Function() cancelRegistration;
   final void Function(
+    BuildContext context,
     String email,
     String displayName,
     String password,
     void Function(Exception e) error,
   ) registerAccount;
-  final void Function() signOut;
+  final void Function(BuildContext context) signOut;
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _getBody(BuildContext context) {
     switch (loginState) {
       case ApplicationLoginState.loggedOut:
-        return Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: StyledButton(
-                onPressed: () {
-                  startLoginFlow();
-                },
-                child: const Text('RSVP'),
-              ),
-            ),
-          ],
-        );
       case ApplicationLoginState.emailAddress:
         return EmailForm(
             callback: (email) => verifyEmail(
@@ -67,7 +72,12 @@ class Authentication extends StatelessWidget {
         return PasswordForm(
           email: email!,
           login: (email, password) {
-            signInWithEmailAndPassword(email, password,
+            signInWithEmailAndPassword(
+                context,
+                email,
+                password,
+                () =>
+                    Navigator.pushNamed(context, ChildSelectionPage.routeName),
                 (e) => _showErrorDialog(context, 'Failed to sign in', e));
           },
         );
@@ -83,6 +93,7 @@ class Authentication extends StatelessWidget {
             password,
           ) {
             registerAccount(
+                context,
                 email,
                 displayName,
                 password,
@@ -91,19 +102,8 @@ class Authentication extends StatelessWidget {
           },
         );
       case ApplicationLoginState.loggedIn:
-        return Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(left: 24, bottom: 8),
-              child: StyledButton(
-                onPressed: () {
-                  signOut();
-                },
-                child: const Text('LOGOUT'),
-              ),
-            ),
-          ],
-        );
+        // Navigator.pushNamed(context, ChildSelectionPage.routeName);
+        return SizedBox();
       default:
         return Row(
           children: const [
@@ -111,6 +111,37 @@ class Authentication extends StatelessWidget {
           ],
         );
     }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.teal,
+      body: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Center(
+                child: const Text(
+                  'Baby Binder',
+                  style: kTitleDarkTextStyle,
+                ),
+              ),
+            ),
+            const SizedBox(height: 30),
+            Expanded(
+              flex: 3,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: _getBody(context),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showErrorDialog(BuildContext context, String title, Exception e) {
@@ -162,53 +193,43 @@ class _EmailFormState extends State<EmailForm> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        const Header('Sign in with email'),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: TextFormField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      hintText: 'Enter your email',
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Enter your email address to continue';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 16.0, horizontal: 30),
-                      child: StyledButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            widget.callback(_controller.text);
-                          }
-                        },
-                        child: const Text('NEXT'),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
+    return Form(
+      key: _formKey,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24),
+        child: TextFormField(
+          controller: _controller,
+          onFieldSubmitted: (_) {
+            if (_formKey.currentState!.validate()) {
+              widget.callback(_controller.text);
+            }
+          },
+          decoration: InputDecoration(
+            filled: kInputDecoration.filled,
+            fillColor: kInputDecoration.fillColor,
+            hintText: 'Enter your email',
+            suffixIcon: IconButton(
+                onPressed: () {
+                  if (_formKey.currentState!.validate()) {
+                    widget.callback(_controller.text);
+                  }
+                },
+                icon: Icon(
+                  Icons.arrow_forward,
+                  color: Colors.teal,
+                )),
+            border: kInputDecoration.border,
+            errorStyle: kInputDecoration.errorStyle,
           ),
+          // style: TextStyle(color: Colors.white),
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Enter your email address to continue';
+            }
+            return null;
+          },
         ),
-      ],
+      ),
     );
   }
 }
@@ -239,11 +260,24 @@ class _RegisterFormState extends State<RegisterForm> {
     _emailController.text = widget.email;
   }
 
+  void submit() {
+    if (_formKey.currentState!.validate()) {
+      widget.registerAccount(
+        _emailController.text,
+        _displayNameController.text,
+        _passwordController.text,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Header('Create account'),
+        const Text(
+          'Create account',
+          style: kTitle2DarkTextStyle,
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -255,8 +289,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      filled: kInputDecoration.filled,
+                      fillColor: kInputDecoration.fillColor,
                       hintText: 'Enter your email',
+                      border: kInputDecoration.border,
+                      errorStyle: kInputDecoration.errorStyle,
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -266,12 +304,17 @@ class _RegisterFormState extends State<RegisterForm> {
                     },
                   ),
                 ),
+                const SizedBox(height: 5),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextFormField(
                     controller: _displayNameController,
-                    decoration: const InputDecoration(
-                      hintText: 'First & last name',
+                    decoration: InputDecoration(
+                      filled: kInputDecoration.filled,
+                      fillColor: kInputDecoration.fillColor,
+                      hintText: 'Enter your name',
+                      border: kInputDecoration.border,
+                      errorStyle: kInputDecoration.errorStyle,
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -281,12 +324,24 @@ class _RegisterFormState extends State<RegisterForm> {
                     },
                   ),
                 ),
+                const SizedBox(height: 5),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
-                      hintText: 'Password',
+                    onFieldSubmitted: (val) => submit(),
+                    decoration: InputDecoration(
+                      filled: kInputDecoration.filled,
+                      fillColor: kInputDecoration.fillColor,
+                      hintText: 'Enter your password',
+                      suffixIcon: IconButton(
+                          onPressed: submit,
+                          icon: Icon(
+                            Icons.arrow_forward,
+                            color: Colors.teal,
+                          )),
+                      border: kInputDecoration.border,
+                      errorStyle: kInputDecoration.errorStyle,
                     ),
                     obscureText: true,
                     validator: (value) {
@@ -304,20 +359,14 @@ class _RegisterFormState extends State<RegisterForm> {
                     children: [
                       TextButton(
                         onPressed: widget.cancel,
-                        child: const Text('CANCEL'),
+                        child: const Text('CANCEL',
+                            style: TextStyle(color: Colors.white)),
                       ),
                       const SizedBox(width: 16),
-                      StyledButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            widget.registerAccount(
-                              _emailController.text,
-                              _displayNameController.text,
-                              _passwordController.text,
-                            );
-                          }
-                        },
-                        child: const Text('SAVE'),
+                      ElevatedButton(
+                        style: kButtonStyle,
+                        onPressed: submit,
+                        child: const Text('REGISTER'),
                       ),
                       const SizedBox(width: 30),
                     ],
@@ -354,11 +403,23 @@ class _PasswordFormState extends State<PasswordForm> {
     _emailController.text = widget.email;
   }
 
+  void submit() {
+    if (_formKey.currentState!.validate()) {
+      widget.login(
+        _emailController.text,
+        _passwordController.text,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const Header('Sign in'),
+        const Text(
+          'Sign in',
+          style: kTitle2DarkTextStyle,
+        ),
         Padding(
           padding: const EdgeInsets.all(8.0),
           child: Form(
@@ -370,8 +431,12 @@ class _PasswordFormState extends State<PasswordForm> {
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextFormField(
                     controller: _emailController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
+                      filled: kInputDecoration.filled,
+                      fillColor: kInputDecoration.fillColor,
                       hintText: 'Enter your email',
+                      border: kInputDecoration.border,
+                      errorStyle: kInputDecoration.errorStyle,
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
@@ -381,12 +446,25 @@ class _PasswordFormState extends State<PasswordForm> {
                     },
                   ),
                 ),
+                const SizedBox(height: 5),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: TextFormField(
                     controller: _passwordController,
-                    decoration: const InputDecoration(
-                      hintText: 'Password',
+                    autofocus: true,
+                    onFieldSubmitted: (val) => submit(),
+                    decoration: InputDecoration(
+                      filled: kInputDecoration.filled,
+                      fillColor: kInputDecoration.fillColor,
+                      hintText: 'Enter your password',
+                      suffixIcon: IconButton(
+                          onPressed: submit,
+                          icon: Icon(
+                            Icons.arrow_forward,
+                            color: Colors.teal,
+                          )),
+                      border: kInputDecoration.border,
+                      errorStyle: kInputDecoration.errorStyle,
                     ),
                     obscureText: true,
                     validator: (value) {
@@ -403,15 +481,9 @@ class _PasswordFormState extends State<PasswordForm> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       const SizedBox(width: 16),
-                      StyledButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            widget.login(
-                              _emailController.text,
-                              _passwordController.text,
-                            );
-                          }
-                        },
+                      ElevatedButton(
+                        style: kButtonStyle,
+                        onPressed: submit,
                         child: const Text('SIGN IN'),
                       ),
                       const SizedBox(width: 30),

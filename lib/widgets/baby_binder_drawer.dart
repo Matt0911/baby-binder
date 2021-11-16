@@ -1,4 +1,5 @@
 import 'package:baby_binder/constants.dart';
+import 'package:baby_binder/models/auth_state.dart';
 import 'package:baby_binder/models/child_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
@@ -64,6 +65,14 @@ class BabyBinderDrawer extends StatelessWidget {
                 ? () => Navigator.pop(context)
                 : () =>
                     Navigator.pushNamed(context, ChildSettingsPage.routeName),
+          ),
+          Consumer<AuthState>(
+            builder: (context, appState, __) => ListTile(
+              leading: Icon(Icons.logout),
+              title: Text('Logout'),
+              selected: false,
+              onTap: () => appState.signOut(context),
+            ),
           ),
         ],
       ),

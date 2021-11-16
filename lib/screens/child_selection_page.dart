@@ -21,24 +21,26 @@ class ChildSelectionPage extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: CarouselSlider(
-                options: CarouselOptions(
-                  aspectRatio: 3 / 4,
-                  enableInfiniteScroll: false,
-                ),
-                items: children.keys.map((i) {
-                  return Builder(
-                    builder: (BuildContext context) {
-                      return Container(
-                        width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
-                        child: ChildCard(
-                          childData: ChildData(id: i),
-                        ),
-                      );
-                    },
-                  );
-                }).toList()),
+            child: Consumer<ChildData>(
+              builder: (context, childData, _) => CarouselSlider(
+                  options: CarouselOptions(
+                    aspectRatio: 3 / 4,
+                    enableInfiniteScroll: false,
+                  ),
+                  items: childData.children.map((child) {
+                    return Builder(
+                      builder: (BuildContext context) {
+                        return Container(
+                          width: MediaQuery.of(context).size.width,
+                          margin: EdgeInsets.symmetric(horizontal: 5.0),
+                          child: ChildCard(
+                            childData: child,
+                          ),
+                        );
+                      },
+                    );
+                  }).toList()),
+            ),
           ),
           Center(
             child: TextButton.icon(

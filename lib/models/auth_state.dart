@@ -1,4 +1,4 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'package:baby_binder/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 // import 'package:google_fonts/google_fonts.dart';
@@ -6,17 +6,19 @@ import 'package:flutter/material.dart';
 
 import 'auth.dart';
 
-class ApplicationState extends ChangeNotifier {
-  ApplicationState() {
+class AuthState extends ChangeNotifier {
+  AuthState() {
     init();
   }
 
+  BuildContext? context;
   Future<void> init() async {
-    await Firebase.initializeApp();
-
     FirebaseAuth.instance.userChanges().listen((user) {
       if (user != null) {
         _loginState = ApplicationLoginState.loggedIn;
+        // if (context != null)
+        //   Navigator.pushReplacementNamed(
+        //       context!, ChildSelectionPage.routeName);
       } else {
         _loginState = ApplicationLoginState.loggedOut;
       }
@@ -24,6 +26,7 @@ class ApplicationState extends ChangeNotifier {
     });
   }
 
+  void Function() loginSuccessCallback = () {};
   ApplicationLoginState _loginState = ApplicationLoginState.loggedOut;
   ApplicationLoginState get loginState => _loginState;
 
@@ -55,10 +58,13 @@ class ApplicationState extends ChangeNotifier {
   }
 
   void signInWithEmailAndPassword(
+    BuildContext context,
     String email,
     String password,
+    void Function() successCallback,
     void Function(FirebaseAuthException e) errorCallback,
   ) async {
+    this.context = context;
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -74,18 +80,24 @@ class ApplicationState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void registerAccount(String email, String displayName, String password,
+  void registerAccount(
+      BuildContext context,
+      String email,
+      String displayName,
+      String password,
       void Function(FirebaseAuthException e) errorCallback) async {
+    this.context = context;
     try {
       var credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await credential.user!.updateProfile(displayName: displayName);
+      await credential.user!.updateDisplayName(displayName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
   }
 
-  void signOut() {
-    FirebaseAuth.instance.signOut();
+  void signOut(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+    Navigator.of(context).pushReplacementNamed(LoginScreen.routeName);
   }
 }
