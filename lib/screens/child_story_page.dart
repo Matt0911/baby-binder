@@ -1,4 +1,5 @@
 import 'package:baby_binder/models/child_data.dart';
+import 'package:baby_binder/models/story_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -17,11 +18,13 @@ class ChildStoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Selector<ChildData, String>(
-      selector: (_, childData) => childData.name,
+      selector: (_, childData) => childData.activeChild!.name,
       builder: (_, name, __) => Scaffold(
         appBar: AppBar(title: Text('$name\'s Story')),
         drawer: BabyBinderDrawer(),
-        body: ChildStory(),
+        body: Selector<ChildData, StoryData>(
+            selector: (_, childData) => childData.activeChild!.story,
+            builder: (_, story, __) => ChildStory(story: story)),
       ),
     );
   }
@@ -62,16 +65,17 @@ class EventButton extends StatelessWidget {
 }
 
 class ChildStory extends StatefulWidget {
-  const ChildStory({Key? key}) : super(key: key);
+  const ChildStory({Key? key, required this.story}) : super(key: key);
+
+  final StoryData story;
 
   @override
   _ChildStoryState createState() => _ChildStoryState();
 }
 
 class _ChildStoryState extends State<ChildStory> {
-  StoryData story = StoryData();
   void _addEvent(StoryEvent event) async {
-    if (event.requiresDialog()) {
+    if (event.requiresDialog) {
       List results = await showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
@@ -84,7 +88,7 @@ class _ChildStoryState extends State<ChildStory> {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 400,
-              child: event.buildAddDialog(),
+              child: event.buildAddDialog!(context),
             ),
           ),
         ),
@@ -93,14 +97,14 @@ class _ChildStoryState extends State<ChildStory> {
       if (didSave) {
         setState(() {
           print('data from dialog: ${results[1]}');
-          story.addEvent(event);
+          widget.story.addEvent(event);
         });
       } else {
         print('user cancelled');
       }
     } else {
       setState(() {
-        story.addEvent(event);
+        widget.story.addEvent(event);
       });
     }
   }
@@ -109,7 +113,7 @@ class _ChildStoryState extends State<ChildStory> {
 
   @override
   Widget build(BuildContext context) {
-    List<StoryEvent> events = story.getEvents();
+    List<StoryEvent> events = widget.story.getEvents();
     bool duringSleep = false;
 
     return Column(
@@ -125,17 +129,16 @@ class _ChildStoryState extends State<ChildStory> {
                   contentsAlign: ContentsAlign.basic,
                   contentsBuilder: (context, index) => Align(
                       alignment: AlignmentDirectional.topStart,
-                      child: Text(events[index].getDescription())),
+                      child: Text(events[index].description)),
                   oppositeContentsBuilder: (context, index) => Align(
                       alignment: AlignmentDirectional.topEnd,
                       child: Text(events[index].getFormattedTime())),
                   // nodePositionBuilder: (context, index) => 0.4,
                   // indicatorPositionBuilder: (context, index) => 0.0,
                   connectorBuilder: (context, index, connectorType) {
-                    if (events[index].getEventType() ==
-                        EventType.ended_sleeping) {
+                    if (events[index].eventType == EventType.ended_sleeping) {
                       duringSleep = true;
-                    } else if (events[index].getEventType() ==
+                    } else if (events[index].eventType ==
                         EventType.started_sleeping) {
                       duringSleep = false;
                     }
@@ -157,7 +160,7 @@ class _ChildStoryState extends State<ChildStory> {
                   },
                   indicatorPositionBuilder: (context, index) => 0,
                   indicatorBuilder: (context, index) {
-                    EventType type = events[index].getEventType();
+                    EventType type = events[index].eventType;
                     return DotIndicator(
                       color: type.iconColor,
                     );
@@ -166,7 +169,8 @@ class _ChildStoryState extends State<ChildStory> {
                 ),
               ),
             )),
-        AddEventButtons(isSleeping: story.isSleeping(), addEvent: _addEvent),
+        AddEventButtons(
+            isSleeping: widget.story.isSleeping(), addEvent: _addEvent),
       ],
     );
   }
@@ -230,23 +234,4 @@ class _AddEventButtonsState extends State<AddEventButtons> {
       ),
     );
   }
-}
-
-class StoryData {
-  List<StoryEvent> _events = [
-    StartSleepEvent.withTime(
-      eventTime: DateTime.now().subtract(Duration(hours: 3)),
-    ),
-  ];
-  bool _isSleeping = true;
-
-  List<StoryEvent> getEvents() => _events;
-  void addEvent(StoryEvent event) {
-    _events.insert(0, event);
-    EventType type = event.getEventType();
-    if (type == EventType.started_sleeping) _isSleeping = true;
-    if (type == EventType.ended_sleeping) _isSleeping = false;
-  }
-
-  bool isSleeping() => _isSleeping;
 }

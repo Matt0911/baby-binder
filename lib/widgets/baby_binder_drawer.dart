@@ -25,8 +25,8 @@ class BabyBinderDrawer extends StatelessWidget {
               children: [
                 Consumer<ChildData>(
                   builder: (_, child, __) => ChildAvatar(
-                    imageUrl: child.image,
-                    name: child.name,
+                    imageUrl: child.activeChild!.image,
+                    name: child.activeChild!.name,
                     maxRadius: 25,
                   ),
                 ),

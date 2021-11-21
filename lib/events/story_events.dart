@@ -1,6 +1,14 @@
+import 'package:baby_binder/events/diaper_event.dart';
+import 'package:baby_binder/events/feeding/feeding_event.dart';
+import 'package:baby_binder/events/sleep_events.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'add_event_dialog.dart';
+
+const kDiaperEventKey = 'diaper';
+const kStartedSleepingEventKey = 'started_sleeping';
+const kEndedSleepingEventKey = 'ended_sleeping';
+const kFeedingEventKey = 'feeding';
 
 enum EventType {
   diaper,
@@ -10,6 +18,21 @@ enum EventType {
 }
 
 extension Event on EventType {
+  String get type {
+    switch (this) {
+      case EventType.diaper:
+        return kDiaperEventKey;
+      case EventType.started_sleeping:
+        return kStartedSleepingEventKey;
+      case EventType.ended_sleeping:
+        return kEndedSleepingEventKey;
+      case EventType.feeding:
+        return kFeedingEventKey;
+      default:
+        return '';
+    }
+  }
+
   String get description {
     switch (this) {
       case EventType.diaper:
@@ -71,36 +94,42 @@ extension Event on EventType {
   }
 }
 
+final DateFormat _formatter = DateFormat('MMM dd hh:mm a');
+
 abstract class StoryEvent {
-  final EventType _eventType;
-  final DateTime _eventTime;
-  final DateFormat _formatter = DateFormat('MMM dd hh:mm a');
-  final String _description;
-  final IconData _icon;
-  final Color _iconColor;
-  final Color _backgroundColor;
-  final bool _requiresDialog;
-  final Widget Function(Function? onSave) _buildAddDialog;
+  final EventType eventType;
+  final DateTime eventTime;
+  final String description;
+  final IconData icon;
+  final Color iconColor;
+  final Color backgroundColor;
+  final bool requiresDialog;
+  Widget Function(BuildContext context)? buildAddDialog;
 
-  StoryEvent(
-      this._eventType,
-      this._eventTime,
-      this._description,
-      this._icon,
-      this._iconColor,
-      this._backgroundColor,
-      this._requiresDialog,
-      this._buildAddDialog);
+  StoryEvent(this.eventType, this.eventTime, this.description, this.icon,
+      this.iconColor, this.backgroundColor, this.requiresDialog);
 
-  String getFormattedTime() => _formatter.format(_eventTime.toLocal());
-  DateTime getLocalTime() => _eventTime.toLocal();
-  EventType getEventType() => _eventType;
-  String getDescription() => _description;
-  IconData getIcon() => _icon;
-  Color getIconColor() => _iconColor;
-  Color getBackgroundColor() => _backgroundColor;
-  bool requiresDialog() => _requiresDialog;
-  Widget buildAddDialog() => _buildAddDialog(null);
+  String getFormattedTime() => _formatter.format(eventTime.toLocal());
+  DateTime getLocalTime() => eventTime.toLocal();
+  Map<String, dynamic> convertToMap() => {
+        'type': eventType.type,
+        'time': eventTime,
+      };
+}
+
+StoryEvent populateEvent(Map<String, dynamic> data) {
+  switch (data['type']) {
+    case kDiaperEventKey:
+      return DiaperEvent();
+    case kStartedSleepingEventKey:
+      return StartSleepEvent.fromData(data);
+    case kEndedSleepingEventKey:
+      return EndSleepEvent();
+    case kFeedingEventKey:
+      return FeedingEvent();
+    default:
+      throw Exception('Invalid event type');
+  }
 }
 
 final Widget Function(Function? onSave) emptyBuilder =

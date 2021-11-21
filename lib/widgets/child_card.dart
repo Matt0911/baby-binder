@@ -24,7 +24,7 @@ class ChildCard extends StatelessWidget {
             )),
             ElevatedButton(
               onPressed: () {
-                context.read<ChildData>().changeChild(id: childData.id);
+                context.read<ChildData>().setActiveChild(id: childData.id);
                 Navigator.pushNamed(context, ChildStoryPage.routeName);
               },
               child: Text('View Story'),

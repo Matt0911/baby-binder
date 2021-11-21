@@ -1,5 +1,4 @@
 import 'package:baby_binder/models/child_data.dart';
-import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:flutter/material.dart';
@@ -22,44 +21,40 @@ class ChildSettingsPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: IconButton(
-        //   padding: const EdgeInsets.all(0),
-        //   alignment: Alignment.center,
-        //   icon: Icon(Icons.menu),
-        //   // color: Colors.red[500],
-        //   onPressed: () => {},
-        //   // enableFeedback: false,
-        // ),
         title: const Text('Baby Binder'),
       ),
       drawer: BabyBinderDrawer(),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Consumer<ChildData>(
-                  builder: (_, childData, __) => ChildAvatar(
-                        imageUrl: childData.image,
-                        name: childData.name,
-                      )),
-            ),
-            Expanded(
-                flex: 1,
-                child: Column(children: [
-                  _buildSettingRow('setting name', 'value'),
-                  _buildSettingRow('setting name 2', 'value 2')
-                ])),
-            // OutlinedButton(
-            //   child: Text(
-            //     'View Story',
-            //     style: TextStyle(fontSize: 20),
-            //   ),
-            //   onPressed: () =>
-            //       Navigator.pushNamed(context, ChildStoryPage.routeName),
-            // ),
-          ],
+        child: Consumer<ChildData>(
+          builder: (_, childData, __) => Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ChildAvatar(
+                  imageUrl: childData.activeChild!.image,
+                  name: childData.activeChild!.name,
+                ),
+              ),
+              ElevatedButton(
+                  onPressed: () => childData.activeChild!.updateName('Testing'),
+                  child: Text('Update Name')),
+              Expanded(
+                  flex: 1,
+                  child: Column(children: [
+                    _buildSettingRow('setting name', 'values'),
+                    _buildSettingRow('setting name 2', 'value 2')
+                  ])),
+              // OutlinedButton(
+              //   child: Text(
+              //     'View Story',
+              //     style: TextStyle(fontSize: 20),
+              //   ),
+              //   onPressed: () =>
+              //       Navigator.pushNamed(context, ChildStoryPage.routeName),
+              // ),
+            ],
+          ),
         ),
       ),
     );

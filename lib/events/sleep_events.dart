@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'story_events.dart';
 
 class StartSleepEvent extends StoryEvent {
@@ -10,7 +12,17 @@ class StartSleepEvent extends StoryEvent {
           EventType.started_sleeping.iconColor,
           EventType.started_sleeping.backgroundColor,
           false,
-          emptyBuilder,
+        );
+
+  StartSleepEvent.fromData(Map<String, dynamic> data)
+      : super(
+          EventType.started_sleeping,
+          (data['time'] as Timestamp).toDate(),
+          EventType.started_sleeping.description,
+          EventType.started_sleeping.icon,
+          EventType.started_sleeping.iconColor,
+          EventType.started_sleeping.backgroundColor,
+          false,
         );
 
   StartSleepEvent.withTime({
@@ -23,7 +35,6 @@ class StartSleepEvent extends StoryEvent {
           EventType.started_sleeping.iconColor,
           EventType.started_sleeping.backgroundColor,
           false,
-          emptyBuilder,
         );
 }
 
@@ -37,7 +48,6 @@ class EndSleepEvent extends StoryEvent {
           EventType.ended_sleeping.iconColor,
           EventType.ended_sleeping.backgroundColor,
           false,
-          emptyBuilder,
         );
 
   EndSleepEvent.withTime({
@@ -50,6 +60,5 @@ class EndSleepEvent extends StoryEvent {
           EventType.ended_sleeping.iconColor,
           EventType.ended_sleeping.backgroundColor,
           false,
-          emptyBuilder,
         );
 }
