@@ -4,6 +4,7 @@ import 'package:baby_binder/models/child_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
+import 'package:baby_binder/screens/labor_tracker_page.dart';
 import 'package:baby_binder/screens/login_screen.dart';
 import 'package:baby_binder/screens/splash_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -59,6 +60,10 @@ class BabyBinder extends StatelessWidget {
             _updateAuthCallbacks(context, appState);
             return ChildStoryPage();
           },
+          LaborTrackerPage.routeName: (context) {
+            _updateAuthCallbacks(context, appState);
+            return LaborTrackerPage();
+          },
         },
       );
     });
@@ -98,7 +103,7 @@ class _LandingFlowState extends State<LandingFlow> {
     }
 
     return SplashScreen(
-      splashDurationInSec: 3,
+      splashMaxDurationInSec: 3,
       onFinished: () => setState(() {
         isSplashOver = true;
       }),

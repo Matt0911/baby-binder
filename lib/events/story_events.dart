@@ -109,6 +109,8 @@ abstract class StoryEvent {
   StoryEvent(this.eventType, this.eventTime, this.description, this.icon,
       this.iconColor, this.backgroundColor, this.requiresDialog);
 
+  String? _id;
+  String? get id => _id;
   String getFormattedTime() => _formatter.format(eventTime.toLocal());
   DateTime getLocalTime() => eventTime.toLocal();
   Map<String, dynamic> convertToMap() => {

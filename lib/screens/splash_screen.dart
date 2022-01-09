@@ -4,15 +4,17 @@ import '../constants.dart';
 
 class SplashScreen extends StatelessWidget {
   const SplashScreen(
-      {Key? key, required this.onFinished, required this.splashDurationInSec})
+      {Key? key,
+      required this.onFinished,
+      required this.splashMaxDurationInSec})
       : super(key: key);
   final Function onFinished;
-  final int splashDurationInSec;
+  final int splashMaxDurationInSec;
 
   @override
   Widget build(BuildContext context) {
     Future.delayed(
-      Duration(seconds: splashDurationInSec),
+      Duration(seconds: splashMaxDurationInSec),
       () => onFinished(),
     );
 

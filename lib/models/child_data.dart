@@ -22,6 +22,7 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 class ChildData extends ChangeNotifier {
   ChildData() {
     _init();
+    // firestore.clearPersistence();
   }
 
   _init() {
@@ -35,13 +36,16 @@ class ChildData extends ChangeNotifier {
           snapshot.docChanges.forEach((docChange) {
             if (docChange.type == DocumentChangeType.added) {
               _children.add(
-                Child(docChange.doc.id, docChange.doc.data()),
+                Child(docChange.doc.id, docChange.doc.data(), () {
+                  print('notifying listenters');
+                  notifyListeners();
+                }),
               );
             } else if (docChange.type == DocumentChangeType.removed) {
               _children.removeWhere((c) => c.id == docChange.doc.id);
             }
           });
-          setActiveChild(id: _children[0].id);
+          // setActiveChild(id: _children[0].id);
           notifyListeners();
         });
       } else {
@@ -58,10 +62,12 @@ class ChildData extends ChangeNotifier {
       _activeChildSubscription?.cancel();
       _activeChild = _children.firstWhere((child) => child.id == id);
       _activeChildSubscription =
-          firestore.doc('children/$id').snapshots().listen((snapshot) {
-        _activeChild!._updateData(snapshot.data());
-        notifyListeners();
-      });
+          firestore.doc('children/$id').snapshots().listen(
+        (snapshot) {
+          _activeChild!._updateData(snapshot.data());
+          notifyListeners();
+        },
+      );
       notifyListeners();
     }
   }
@@ -78,9 +84,13 @@ final DateFormat _formatter = DateFormat();
 
 class Child {
   Child.manual({required String id, required this.name, required this.image})
-      : _id = id;
+      : _id = id,
+        _document = firestore.collection('children').doc(id);
 
-  Child(String id, Map<String, dynamic>? data) : _id = id {
+  Child(String id, Map<String, dynamic>? data, Function onChange)
+      : _id = id,
+        _document = firestore.collection('children').doc(id),
+        _onChange = onChange {
     _updateData(data);
   }
 
@@ -92,17 +102,18 @@ class Child {
       if (t != null) {
         birthdate = t.toDate();
       }
-      List<dynamic>? events = data['events'];
-      if (events != null) {
-        this.story = StoryData.fromData(events);
-      } else {
-        this.story = StoryData();
+      // TODO: creating a new one on every change is very inefficient because array gets reversed each time
+      if (story == null) {
+        story = StoryData(data, _document, _onChange);
       }
     }
   }
 
   final String _id;
   String get id => _id;
+  Function? _onChange;
+
+  DocumentReference<Map<String, dynamic>> _document;
 
   late String name;
 
@@ -111,9 +122,9 @@ class Child {
   DateTime? birthdate;
   bool get isBorn => birthdate != null;
 
-  late StoryData story;
+  StoryData? story;
 
   void updateName(String name) {
-    firestore.collection('children').doc(_id).update({'name': name});
+    _document.update({'name': name});
   }
 }
