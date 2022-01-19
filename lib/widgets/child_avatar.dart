@@ -5,13 +5,13 @@ class ChildAvatar extends StatelessWidget {
   const ChildAvatar({
     Key? key,
     required this.imageUrl,
-    required this.name,
+    this.name,
     this.maxRadius = 80,
   }) : super(key: key);
 
   final double maxRadius;
   final String imageUrl;
-  final String name;
+  final String? name;
 
   @override
   Widget build(BuildContext context) {
@@ -25,13 +25,15 @@ class ChildAvatar extends StatelessWidget {
             minRadius: 25,
             maxRadius: maxRadius,
           ),
-          Container(
-            padding: const EdgeInsets.only(top: 8, bottom: 8),
-            child: Text(
-              name,
-              style: TextStyle(fontSize: 20, color: kGreyTextColor),
-            ),
-          )
+          name != null
+              ? Container(
+                  padding: const EdgeInsets.only(top: 8, bottom: 8),
+                  child: Text(
+                    name!,
+                    style: TextStyle(fontSize: 20, color: kGreyTextColor),
+                  ),
+                )
+              : SizedBox()
         ],
       ),
     );

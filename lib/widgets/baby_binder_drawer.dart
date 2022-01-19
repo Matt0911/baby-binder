@@ -1,34 +1,34 @@
 import 'package:baby_binder/constants.dart';
-import 'package:baby_binder/models/auth_state.dart';
-import 'package:baby_binder/models/child_data.dart';
+import 'package:baby_binder/providers/auth_state.dart';
+import 'package:baby_binder/providers/child_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'child_avatar.dart';
 
-class BabyBinderDrawer extends StatelessWidget {
+class BabyBinderDrawer extends ConsumerWidget {
   const BabyBinderDrawer({
     Key? key,
   }) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context, ref) {
     String currentRoute = ModalRoute.of(context)!.settings.name ?? 'test';
+    final activeChild = ref.watch(childDataProvider).activeChild;
+    final authState = ref.watch(authStateProvider);
     return Drawer(
       child: ListView(
         children: [
           DrawerHeader(
             child: Column(
               children: [
-                Consumer<ChildData>(
-                  builder: (_, child, __) => ChildAvatar(
-                    imageUrl: child.activeChild!.image,
-                    name: child.activeChild!.name,
-                    maxRadius: 25,
-                  ),
+                ChildAvatar(
+                  imageUrl: activeChild!.image,
+                  name: activeChild.name,
+                  maxRadius: 25,
                 ),
                 TextButton.icon(
                   onPressed: () => Navigator.pushNamed(
@@ -66,13 +66,11 @@ class BabyBinderDrawer extends StatelessWidget {
                 : () =>
                     Navigator.pushNamed(context, ChildSettingsPage.routeName),
           ),
-          Consumer<AuthState>(
-            builder: (context, appState, __) => ListTile(
-              leading: Icon(Icons.logout),
-              title: Text('Logout'),
-              selected: false,
-              onTap: () => appState.signOut(context),
-            ),
+          ListTile(
+            leading: Icon(Icons.logout),
+            title: Text('Logout'),
+            selected: false,
+            onTap: () => authState.signOut(context),
           ),
         ],
       ),

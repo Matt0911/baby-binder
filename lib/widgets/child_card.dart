@@ -1,16 +1,17 @@
-import 'package:baby_binder/models/child_data.dart';
+import 'package:baby_binder/providers/child_data.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/src/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'child_avatar.dart';
 
-class ChildCard extends StatelessWidget {
+class ChildCard extends ConsumerWidget {
   const ChildCard({Key? key, required this.childData}) : super(key: key);
   final Child childData;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context, ref) {
+    final setActiveChild = ref.read(childDataProvider).setActiveChild;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -23,8 +24,8 @@ class ChildCard extends StatelessWidget {
               maxRadius: MediaQuery.of(context).size.width / 3,
             )),
             ElevatedButton(
-              onPressed: () {
-                context.read<ChildData>().setActiveChild(id: childData.id);
+              onPressed: () async {
+                await setActiveChild(id: childData.id);
                 Navigator.pushNamed(context, ChildStoryPage.routeName);
               },
               child: Text('View Story'),

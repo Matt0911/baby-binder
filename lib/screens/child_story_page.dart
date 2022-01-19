@@ -1,9 +1,9 @@
-import 'package:baby_binder/models/child_data.dart';
-import 'package:baby_binder/models/story_data.dart';
+import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/story_data.dart';
 import 'package:baby_binder/screens/labor_tracker_page.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
 import '../events/story_events.dart';
@@ -11,25 +11,23 @@ import '../events/sleep_events.dart';
 import '../events/diaper_event.dart';
 import '../events/feeding/feeding_event.dart';
 
-class ChildStoryPage extends StatelessWidget {
+class ChildStoryPage extends ConsumerWidget {
   static final routeName = '/child-story';
 
   const ChildStoryPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Selector<ChildData, String>(
-      selector: (_, childData) => childData.activeChild!.name,
-      builder: (_, name, __) => Scaffold(
-        appBar: AppBar(title: Text('$name\'s Story')),
-        drawer: BabyBinderDrawer(),
-        body: Consumer<ChildData>(builder: (_, childData, __) {
-          return ChildStory(
-            addEvent: childData.activeChild!.story!.addEvent,
-            events: childData.activeChild!.story!.getEvents(),
-            isSleeping: childData.activeChild!.story!.isSleeping(),
-          );
-        }),
+  Widget build(context, ref) {
+    final childdata = ref.watch(childDataProvider);
+    Child? activeChild = childdata.activeChild;
+    return Scaffold(
+      appBar: AppBar(title: Text('${activeChild!.name}\'s Story')),
+      drawer: BabyBinderDrawer(),
+      body: ChildStory(
+        // TODO: better timing/null handling
+        addEvent: activeChild.story?.addEvent ?? () {},
+        events: activeChild.story?.getEvents() ?? [],
+        isSleeping: activeChild.story?.isSleeping ?? false,
       ),
     );
   }
@@ -174,7 +172,7 @@ class ChildStory extends StatelessWidget {
   }
 }
 
-class AddEventButtons extends StatefulWidget {
+class AddEventButtons extends ConsumerStatefulWidget {
   const AddEventButtons(
       {Key? key, required this.isSleeping, required this.addEvent})
       : super(key: key);
@@ -185,7 +183,7 @@ class AddEventButtons extends StatefulWidget {
   _AddEventButtonsState createState() => _AddEventButtonsState();
 }
 
-class _AddEventButtonsState extends State<AddEventButtons> {
+class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
   bool clicked = false;
   List<Widget> getBornEvents(BuildContext context) => [
         EventButton(
@@ -230,22 +228,21 @@ class _AddEventButtonsState extends State<AddEventButtons> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<ChildData>(builder: (_, childData, __) {
-      return Material(
-        color: Colors.teal[300],
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 20,
-            runSpacing: 20,
-            children: childData.activeChild!.isBorn
-                ? getBornEvents(context)
-                : getUnbornEvents(context),
-          ),
+    final activeChild = ref.watch(childDataProvider).activeChild;
+    return Material(
+      color: Colors.teal[300],
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          spacing: 20,
+          runSpacing: 20,
+          children: activeChild!.isBorn
+              ? getBornEvents(context)
+              : getUnbornEvents(context),
         ),
-      );
-    });
+      ),
+    );
   }
 }

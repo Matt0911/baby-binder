@@ -1,27 +1,25 @@
-import 'package:baby_binder/models/auth_state.dart';
-import 'package:baby_binder/models/auth.dart';
+import 'package:baby_binder/providers/auth_state.dart';
+import 'package:baby_binder/providers/auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends ConsumerWidget {
   static final String routeName = '/login-page';
 
   const LoginScreen({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return Consumer<AuthState>(
-      builder: (context, appState, _) => Material(
-        child: Authentication(
-            loginState: appState.loginState,
-            email: appState.email,
-            startLoginFlow: appState.startLoginFlow,
-            verifyEmail: appState.verifyEmail,
-            signInWithEmailAndPassword: appState.signInWithEmailAndPassword,
-            cancelRegistration: appState.cancelRegistration,
-            registerAccount: appState.registerAccount,
-            signOut: appState.signOut),
-      ),
+  Widget build(context, ref) {
+    final authState = ref.watch(authStateProvider);
+    return Authentication(
+      loginState: authState.loginState,
+      email: authState.email,
+      startLoginFlow: authState.startLoginFlow,
+      verifyEmail: authState.verifyEmail,
+      signInWithEmailAndPassword: authState.signInWithEmailAndPassword,
+      cancelRegistration: authState.cancelRegistration,
+      registerAccount: authState.registerAccount,
+      signOut: authState.signOut,
     );
   }
 }

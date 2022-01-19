@@ -1,10 +1,12 @@
 import 'package:baby_binder/screens/login_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 // import 'package:google_fonts/google_fonts.dart';
-// import 'package:provider/provider.dart';
 
 import 'auth.dart';
+
+final authStateProvider = ChangeNotifierProvider((ref) => AuthState());
 
 class AuthState extends ChangeNotifier {
   AuthState() {
