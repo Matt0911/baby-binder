@@ -1,4 +1,4 @@
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:baby_binder/widgets/child_card.dart';
@@ -13,7 +13,7 @@ class ChildSelectionPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final childData = ref.watch(childDataProvider);
+    final childData = ref.watch(childrenDataProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Children'),

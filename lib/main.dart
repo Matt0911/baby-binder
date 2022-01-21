@@ -1,7 +1,7 @@
 import 'package:baby_binder/firebase_options.dart';
 import 'package:baby_binder/providers/auth_state.dart';
 import 'package:baby_binder/providers/auth.dart';
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';

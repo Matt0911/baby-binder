@@ -1,6 +1,6 @@
 import 'package:baby_binder/constants.dart';
 import 'package:baby_binder/providers/auth_state.dart';
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
@@ -17,7 +17,7 @@ class BabyBinderDrawer extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     String currentRoute = ModalRoute.of(context)!.settings.name ?? 'test';
-    final activeChild = ref.watch(childDataProvider).activeChild;
+    final activeChild = ref.watch(childrenDataProvider).activeChild;
     final authState = ref.watch(authStateProvider);
     return Drawer(
       child: ListView(

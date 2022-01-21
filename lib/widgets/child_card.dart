@@ -1,4 +1,4 @@
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class ChildCard extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final setActiveChild = ref.read(childDataProvider).setActiveChild;
+    final setActiveChild = ref.read(childrenDataProvider).setActiveChild;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),

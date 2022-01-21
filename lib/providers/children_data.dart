@@ -21,70 +21,74 @@ Map<int, dynamic> children = {
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-final childDataProvider = ChangeNotifierProvider((ref) => ChildData());
+final childrenDataProvider = ChangeNotifierProvider((ref) => ChildrenData());
 
-class ChildData extends ChangeNotifier {
-  ChildData() {
-    _init();
+class ChildrenData extends ChangeNotifier {
+  ChildrenData() {
     // firestore.clearPersistence();
+    _init();
   }
 
   _init() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs = await SharedPreferences.getInstance();
     FirebaseAuth.instance.userChanges().listen((user) {
       if (user != null) {
+        final initialSavedChildId = prefs.getString('activeChild');
         _childrenListSubscription = firestore
             .collection('children')
             // .where(field) TODO: only children with user ID
             .snapshots()
-            .listen((snapshot) {
-          snapshot.docChanges.forEach((docChange) {
-            if (docChange.type == DocumentChangeType.added) {
-              _children.add(
-                Child(docChange.doc.id, docChange.doc.data()),
-              );
-            } else if (docChange.type == DocumentChangeType.removed) {
-              _children.removeWhere((c) => c.id == docChange.doc.id);
-            }
-          });
-          final savedChildId = prefs.getString('activeChildId');
-          if (savedChildId != null &&
-              _children.indexWhere((element) => element.id == savedChildId) !=
-                  -1) {
-            setActiveChild(id: savedChildId);
-          }
-          notifyListeners();
-        });
+            .listen(
+          (snapshot) {
+            snapshot.docChanges.forEach((docChange) {
+              if (docChange.type == DocumentChangeType.added) {
+                final addedChild =
+                    Child(docChange.doc.id, docChange.doc.data());
+                _children.add(addedChild);
+                if (initialSavedChildId != null &&
+                    initialSavedChildId == addedChild._id &&
+                    activeChild == null) {
+                  setActiveChild(id: initialSavedChildId);
+                }
+              } else if (docChange.type == DocumentChangeType.removed) {
+                _children.removeWhere((c) => c.id == docChange.doc.id);
+              } else if (docChange.type == DocumentChangeType.modified) {
+                _children
+                    .firstWhere((element) => element.id == docChange.doc.id)
+                    ._updateData(docChange.doc.data());
+              }
+            });
+            notifyListeners();
+          },
+        );
       } else {
         _children = [];
         activeChild = null;
         _childrenListSubscription?.cancel();
+        notifyListeners();
       }
-      notifyListeners();
     });
   }
 
   setActiveChild({required String id}) async {
     if (activeChild == null || id != activeChild?.id) {
       activeChild = _children.firstWhere((child) => child.id == id);
-      _activeChildSubscription?.cancel();
-      _activeChildSubscription =
-          firestore.doc('children/$id').snapshots().listen(
-        (snapshot) {
-          activeChild!._updateData(snapshot.data());
-          notifyListeners();
-        },
-      );
+      prefs.setString('activeChild', id);
       notifyListeners();
     }
   }
 
+  late SharedPreferences prefs;
   StreamSubscription<QuerySnapshot>? _childrenListSubscription;
-  StreamSubscription<DocumentSnapshot>? _activeChildSubscription;
   List<Child> _children = [];
   List<Child> get children => _children;
   Child? activeChild;
 }
+
+final activeChildProvider = Provider((ref) {
+  final childrenData = ref.watch(childrenDataProvider);
+  return childrenData.activeChild;
+});
 
 final DateFormat _formatter = DateFormat();
 

@@ -1,4 +1,4 @@
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/providers/story_data.dart';
 import 'package:baby_binder/screens/labor_tracker_page.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
@@ -18,17 +18,12 @@ class ChildStoryPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final childdata = ref.watch(childDataProvider);
+    final childdata = ref.watch(childrenDataProvider);
     Child? activeChild = childdata.activeChild;
     return Scaffold(
       appBar: AppBar(title: Text('${activeChild!.name}\'s Story')),
       drawer: BabyBinderDrawer(),
-      body: ChildStory(
-        // TODO: better timing/null handling
-        addEvent: activeChild.story?.addEvent ?? () {},
-        events: activeChild.story?.getEvents() ?? [],
-        isSleeping: activeChild.story?.isSleeping ?? false,
-      ),
+      body: ChildStory(),
     );
   }
 }
@@ -67,19 +62,16 @@ class EventButton extends StatelessWidget {
   }
 }
 
-class ChildStory extends StatelessWidget {
+class ChildStory extends ConsumerWidget {
   ChildStory({
     Key? key,
-    required this.addEvent,
-    required this.events,
-    required this.isSleeping,
   }) : super(key: key);
 
-  final Function addEvent;
-  final List<StoryEvent> events;
-  final bool isSleeping;
-
-  void _addEvent(BuildContext context, StoryEvent event) async {
+  void _addEvent(
+    BuildContext context,
+    StoryEvent event,
+    StoryData story,
+  ) async {
     if (event.requiresDialog) {
       List results = await showModalBottomSheet(
         isScrollControlled: true,
@@ -100,18 +92,20 @@ class ChildStory extends StatelessWidget {
       );
       bool didSave = results[0];
       if (didSave) {
-        addEvent(event);
+        story.addEvent(event);
       } else {
         print('user cancelled');
       }
     } else {
-      addEvent(event);
+      story.addEvent(event);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context, ref) {
     bool duringSleep = false;
+    final story = ref.watch(storyDataProvider);
+    final events = story.events;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -166,18 +160,15 @@ class ChildStory extends StatelessWidget {
                 ),
               ),
             )),
-        AddEventButtons(isSleeping: isSleeping, addEvent: _addEvent),
+        AddEventButtons(addEvent: _addEvent),
       ],
     );
   }
 }
 
 class AddEventButtons extends ConsumerStatefulWidget {
-  const AddEventButtons(
-      {Key? key, required this.isSleeping, required this.addEvent})
-      : super(key: key);
-  final bool isSleeping;
-  final Function(BuildContext, StoryEvent) addEvent;
+  const AddEventButtons({Key? key, required this.addEvent}) : super(key: key);
+  final Function(BuildContext, StoryEvent, StoryData) addEvent;
 
   @override
   _AddEventButtonsState createState() => _AddEventButtonsState();
@@ -185,14 +176,14 @@ class AddEventButtons extends ConsumerStatefulWidget {
 
 class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
   bool clicked = false;
-  List<Widget> getBornEvents(BuildContext context) => [
+  List<Widget> getBornEvents(BuildContext context, StoryData story) => [
         EventButton(
           size: 60,
           backgroundColor: EventType.ended_sleeping.backgroundColor,
           icon: EventType.ended_sleeping.icon,
           iconColor: EventType.ended_sleeping.iconColor,
-          onPressed: () => widget.addEvent(
-              context, widget.isSleeping ? EndSleepEvent() : StartSleepEvent()),
+          onPressed: () => widget.addEvent(context,
+              story.isSleeping ? EndSleepEvent() : StartSleepEvent(), story),
         ),
         EventButton(
           size: 60,
@@ -201,7 +192,7 @@ class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
           iconColor: EventType.diaper.iconColor,
           onPressed: () {
             setState(() {
-              widget.addEvent(context, DiaperEvent());
+              widget.addEvent(context, DiaperEvent(), story);
               clicked = true;
             });
           },
@@ -211,7 +202,7 @@ class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
           backgroundColor: EventType.feeding.backgroundColor,
           icon: EventType.feeding.icon,
           iconColor: EventType.feeding.iconColor,
-          onPressed: () => widget.addEvent(context, FeedingEvent()),
+          onPressed: () => widget.addEvent(context, FeedingEvent(), story),
         ),
       ];
 
@@ -228,7 +219,8 @@ class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final activeChild = ref.watch(childDataProvider).activeChild;
+    final activeChild = ref.watch(childrenDataProvider).activeChild;
+    final story = ref.watch(storyDataProvider);
     return Material(
       color: Colors.teal[300],
       child: Padding(
@@ -239,7 +231,7 @@ class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
           spacing: 20,
           runSpacing: 20,
           children: activeChild!.isBorn
-              ? getBornEvents(context)
+              ? getBornEvents(context, story)
               : getUnbornEvents(context),
         ),
       ),

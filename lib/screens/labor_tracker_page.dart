@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:baby_binder/constants.dart';
-import 'package:baby_binder/providers/child_data.dart';
+import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/providers/story_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
