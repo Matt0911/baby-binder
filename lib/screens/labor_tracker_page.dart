@@ -87,7 +87,6 @@ class _ContractionTimerButtonState extends State<ContractionTimerButton> {
     _timer = new Timer.periodic(
       oneSec,
       (Timer timer) {
-        print('timer fired');
         if (widget.isRunning) {
           setState(() {
             _label = '${widget.stopwatch.elapsed.inSeconds}s';
