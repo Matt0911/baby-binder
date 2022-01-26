@@ -5,60 +5,41 @@ import 'story_events.dart';
 class StartSleepEvent extends StoryEvent {
   StartSleepEvent()
       : super(
-          EventType.started_sleeping,
-          DateTime.now(),
-          EventType.started_sleeping.description,
-          EventType.started_sleeping.icon,
-          EventType.started_sleeping.iconColor,
-          EventType.started_sleeping.backgroundColor,
-          false,
+          eventType: EventType.started_sleeping,
+          eventTime: DateTime.now(),
         );
 
   StartSleepEvent.fromData(Map<String, dynamic> data)
       : super(
-          EventType.started_sleeping,
-          (data['time'] as Timestamp).toDate(),
-          EventType.started_sleeping.description,
-          EventType.started_sleeping.icon,
-          EventType.started_sleeping.iconColor,
-          EventType.started_sleeping.backgroundColor,
-          false,
+          eventType: EventType.started_sleeping,
+          eventTime: (data['time'] as Timestamp).toDate(),
         );
 
   StartSleepEvent.withTime({
     required eventTime,
   }) : super(
-          EventType.started_sleeping,
-          eventTime,
-          EventType.started_sleeping.description,
-          EventType.started_sleeping.icon,
-          EventType.started_sleeping.iconColor,
-          EventType.started_sleeping.backgroundColor,
-          false,
+          eventType: EventType.started_sleeping,
+          eventTime: eventTime,
         );
 }
 
 class EndSleepEvent extends StoryEvent {
   EndSleepEvent()
       : super(
-          EventType.ended_sleeping,
-          DateTime.now(),
-          EventType.ended_sleeping.description,
-          EventType.ended_sleeping.icon,
-          EventType.ended_sleeping.iconColor,
-          EventType.ended_sleeping.backgroundColor,
-          false,
+          eventType: EventType.ended_sleeping,
+          eventTime: DateTime.now(),
+        );
+
+  EndSleepEvent.fromData(Map<String, dynamic> data)
+      : super(
+          eventType: EventType.ended_sleeping,
+          eventTime: (data['time'] as Timestamp).toDate(),
         );
 
   EndSleepEvent.withTime({
     required eventTime,
   }) : super(
-          EventType.ended_sleeping,
-          eventTime,
-          EventType.ended_sleeping.description,
-          EventType.ended_sleeping.icon,
-          EventType.ended_sleeping.iconColor,
-          EventType.ended_sleeping.backgroundColor,
-          false,
+          eventType: EventType.ended_sleeping,
+          eventTime: eventTime,
         );
 }

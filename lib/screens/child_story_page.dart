@@ -72,7 +72,7 @@ class ChildStory extends ConsumerWidget {
     StoryEvent event,
     StoryData story,
   ) async {
-    if (event.requiresDialog) {
+    if (event.buildAddDialog != null) {
       List results = await showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
@@ -120,7 +120,7 @@ class ChildStory extends ConsumerWidget {
                   contentsAlign: ContentsAlign.basic,
                   contentsBuilder: (context, index) => Align(
                       alignment: AlignmentDirectional.topStart,
-                      child: Text(events[index].description)),
+                      child: Text(events[index].eventType.description)),
                   oppositeContentsBuilder: (context, index) => Align(
                       alignment: AlignmentDirectional.topEnd,
                       child: Text(events[index].getFormattedTime())),

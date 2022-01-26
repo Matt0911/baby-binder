@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'story_events.dart';
 import 'add_event_dialog.dart';
@@ -80,25 +81,21 @@ class DiaperEvent extends StoryEvent {
 
   DiaperEvent()
       : super(
-          EventType.diaper,
-          DateTime.now(),
-          EventType.diaper.description,
-          EventType.diaper.icon,
-          EventType.diaper.iconColor,
-          EventType.diaper.backgroundColor,
-          true,
+          eventType: EventType.diaper,
+          eventTime: DateTime.now(),
+        );
+
+  DiaperEvent.fromData(Map<String, dynamic> data)
+      : super(
+          eventType: EventType.diaper,
+          eventTime: (data['time'] as Timestamp).toDate(),
         );
 
   DiaperEvent.withTime({
     required eventTime,
   }) : super(
-          EventType.diaper,
-          eventTime,
-          EventType.diaper.description,
-          EventType.diaper.icon,
-          EventType.diaper.iconColor,
-          EventType.diaper.backgroundColor,
-          true,
+          eventType: EventType.diaper,
+          eventTime: eventTime,
         );
 
   @override

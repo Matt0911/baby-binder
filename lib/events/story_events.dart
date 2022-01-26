@@ -99,15 +99,10 @@ final DateFormat _formatter = DateFormat('MMM dd hh:mm a');
 abstract class StoryEvent {
   final EventType eventType;
   final DateTime eventTime;
-  final String description;
-  final IconData icon;
-  final Color iconColor;
-  final Color backgroundColor;
-  final bool requiresDialog;
   Widget Function(BuildContext context)? buildAddDialog;
 
-  StoryEvent(this.eventType, this.eventTime, this.description, this.icon,
-      this.iconColor, this.backgroundColor, this.requiresDialog);
+  StoryEvent(
+      {required this.eventType, required this.eventTime, this.buildAddDialog});
 
   String? _id;
   String? get id => _id;
@@ -122,13 +117,13 @@ abstract class StoryEvent {
 StoryEvent populateEvent(Map<String, dynamic> data) {
   switch (data['type']) {
     case kDiaperEventKey:
-      return DiaperEvent();
+      return DiaperEvent.fromData(data);
     case kStartedSleepingEventKey:
       return StartSleepEvent.fromData(data);
     case kEndedSleepingEventKey:
-      return EndSleepEvent();
+      return EndSleepEvent.fromData(data);
     case kFeedingEventKey:
-      return FeedingEvent();
+      return FeedingEvent.fromData(data);
     default:
       throw Exception('Invalid event type');
   }

@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../story_events.dart';
 import '../add_event_dialog.dart';
@@ -45,24 +46,20 @@ class FeedingEvent extends StoryEvent {
 
   FeedingEvent()
       : super(
-          EventType.feeding,
-          DateTime.now(),
-          EventType.feeding.description,
-          EventType.feeding.icon,
-          EventType.feeding.iconColor,
-          EventType.feeding.backgroundColor,
-          true,
+          eventType: EventType.feeding,
+          eventTime: DateTime.now(),
+        );
+
+  FeedingEvent.fromData(Map<String, dynamic> data)
+      : super(
+          eventType: EventType.feeding,
+          eventTime: (data['time'] as Timestamp).toDate(),
         );
 
   FeedingEvent.withTime({
     required eventTime,
   }) : super(
-          EventType.feeding,
-          eventTime,
-          EventType.feeding.description,
-          EventType.feeding.icon,
-          EventType.feeding.iconColor,
-          EventType.feeding.backgroundColor,
-          true,
+          eventType: EventType.feeding,
+          eventTime: eventTime,
         );
 }

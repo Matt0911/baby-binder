@@ -5,7 +5,8 @@ class AddEventDialog extends StatefulWidget {
       : super(key: key);
 
   final String title;
-  final Widget Function(Map, Function) content;
+  final Widget Function(Map, void Function(Map data, {bool shouldMerge}))
+      content;
 
   @override
   _AddEventDialogState createState() => _AddEventDialogState();
@@ -14,10 +15,15 @@ class AddEventDialog extends StatefulWidget {
 class _AddEventDialogState extends State<AddEventDialog> {
   Map eventData = {};
 
-  _updateEventData(Map data) {
+  void _updateEventData(Map data, {bool shouldMerge = true}) {
     setState(() {
-      eventData.addAll(data);
+      if (shouldMerge) {
+        eventData.addAll(data);
+      } else {
+        eventData = data;
+      }
     });
+    return;
   }
 
   @override
