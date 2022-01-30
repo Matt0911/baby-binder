@@ -2,16 +2,12 @@ import 'dart:async';
 
 import 'package:baby_binder/constants.dart';
 import 'package:baby_binder/providers/children_data.dart';
-import 'package:baby_binder/providers/story_data.dart';
+import 'package:baby_binder/providers/labor_tracker.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
-import '../events/story_events.dart';
-import '../events/sleep_events.dart';
-import '../events/diaper_event.dart';
-import '../events/feeding/feeding_event.dart';
 
 class AveragesDisplay extends StatelessWidget {
   const AveragesDisplay({Key? key}) : super(key: key);
@@ -37,16 +33,6 @@ class AveragesDisplay extends StatelessWidget {
       ],
     );
   }
-}
-
-class Contraction {
-  Contraction({DateTime? start}) {
-    this._start = start ?? DateTime.now();
-  }
-
-  late DateTime _start;
-  DateTime get start => _start;
-  Duration? duration;
 }
 
 class ContractionRow extends StatelessWidget {
@@ -98,7 +84,6 @@ class _ContractionTimerButtonState extends State<ContractionTimerButton> {
 
   @override
   void dispose() {
-    print('disposing');
     _timer?.cancel();
     super.dispose();
   }
@@ -127,12 +112,12 @@ class LaborTrackerPage extends ConsumerStatefulWidget {
 }
 
 class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
-  List<Contraction> contractions = [];
   Contraction? currentContraction;
 
   @override
   Widget build(BuildContext context) {
-    // final childData = ref.watch(childDataProvider);
+    final activeChild = ref.watch(activeChildProvider);
+    final laborData = ref.watch(laborTrackerDataProvider);
     return Scaffold(
       appBar: AppBar(title: Text('Labor Tracker')),
       drawer: BabyBinderDrawer(),
@@ -151,9 +136,9 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
           Expanded(
             flex: 3,
             child: ListView.builder(
-              itemCount: contractions.length,
+              itemCount: laborData.contractions.length,
               itemBuilder: (context, i) => ContractionRow(
-                contraction: contractions[contractions.length - 1 - i],
+                contraction: laborData.contractions[i],
               ),
             ),
           ),
@@ -168,7 +153,7 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
                   } else {
                     widget.stopwatch.stop();
                     currentContraction!.duration = widget.stopwatch.elapsed;
-                    contractions.add(currentContraction!);
+                    laborData.addNewContraction(currentContraction!);
                     widget.stopwatch.reset();
                     currentContraction = null;
                   }
