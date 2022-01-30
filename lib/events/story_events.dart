@@ -114,7 +114,7 @@ abstract class StoryEvent {
       };
 }
 
-StoryEvent populateEvent(Map<String, dynamic> data) {
+StoryEvent createEventFromData(Map<String, dynamic> data) {
   switch (data['type']) {
     case kDiaperEventKey:
       return DiaperEvent.fromData(data);
@@ -124,6 +124,21 @@ StoryEvent populateEvent(Map<String, dynamic> data) {
       return EndSleepEvent.fromData(data);
     case kFeedingEventKey:
       return FeedingEvent.fromData(data);
+    default:
+      throw Exception('Invalid event type');
+  }
+}
+
+StoryEvent createEventFromType(EventType type) {
+  switch (type) {
+    case EventType.diaper:
+      return DiaperEvent();
+    case EventType.started_sleeping:
+      return StartSleepEvent();
+    case EventType.ended_sleeping:
+      return EndSleepEvent();
+    case EventType.feeding:
+      return FeedingEvent();
     default:
       throw Exception('Invalid event type');
   }

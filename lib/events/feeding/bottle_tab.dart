@@ -1,8 +1,8 @@
 import 'dart:math';
 
+import 'package:baby_binder/constants.dart';
+import 'package:baby_binder/events/feeding/feeding_event.dart';
 import 'package:flutter/material.dart';
-
-import '../../constants.dart';
 
 const double minOz = .1;
 const double maxOz = 10;
@@ -11,42 +11,40 @@ const double maxML = 100;
 
 class BottleTab extends StatelessWidget {
   const BottleTab(
-      {Key? key, required this.eventData, required this.updateEventData})
+      {Key? key, required this.event, required this.updateEventData})
       : super(key: key);
-  final Map eventData;
-  final Function updateEventData;
+  final FeedingEvent event;
+  final Function(Function()) updateEventData;
 
   @override
   Widget build(BuildContext context) {
-    bool isOunces = eventData['isOunces'] ?? true;
-    double volume = eventData['volume'] ?? 4;
-
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('$volume', style: kLargeNumberTextStyle),
+            Text('${event.volume}', style: kLargeNumberTextStyle),
             SizedBox(width: 20),
             ToggleButtons(
-              isSelected: [isOunces, !isOunces],
+              isSelected: [event.isOunces, !event.isOunces],
               borderRadius: BorderRadius.circular(10),
               onPressed: (selected) {
                 bool changingToOunces = selected == 0;
-                if (changingToOunces != isOunces) {
+                if (changingToOunces != event.isOunces) {
                   double convertedVolume;
                   if (changingToOunces) {
                     convertedVolume = max(
-                        double.parse((volume / 29.5735).toStringAsFixed(1)),
+                        double.parse(
+                            (event.volume / 29.5735).toStringAsFixed(1)),
                         minOz);
                   } else {
                     convertedVolume =
-                        min((volume * 29.5735).floorToDouble(), maxML);
+                        min((event.volume * 29.5735).floorToDouble(), maxML);
                   }
-                  updateEventData({
-                    'isOunces': changingToOunces,
-                    'volume': convertedVolume
+                  updateEventData(() {
+                    event.isOunces = changingToOunces;
+                    event.volume = convertedVolume;
                   });
                 }
               },
@@ -55,13 +53,14 @@ class BottleTab extends StatelessWidget {
           ],
         ),
         Slider(
-            value: volume,
-            min: isOunces ? minOz : minML,
-            max: isOunces ? maxOz : maxML,
-            onChanged: (volume) => updateEventData({
-                  'volume':
-                      double.parse(volume.toStringAsFixed(isOunces ? 1 : 0))
-                }))
+          value: event.volume,
+          min: event.isOunces ? minOz : minML,
+          max: event.isOunces ? maxOz : maxML,
+          onChanged: (volume) => updateEventData(
+            () => event.volume =
+                double.parse(volume.toStringAsFixed(event.isOunces ? 1 : 0)),
+          ),
+        )
       ],
     );
   }

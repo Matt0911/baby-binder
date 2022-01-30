@@ -1,12 +1,17 @@
+import 'package:baby_binder/events/story_events.dart';
 import 'package:flutter/material.dart';
 
 class AddEventDialog extends StatefulWidget {
-  const AddEventDialog({Key? key, required this.title, required this.content})
-      : super(key: key);
+  const AddEventDialog({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.event,
+  }) : super(key: key);
 
   final String title;
-  final Widget Function(Map, void Function(Map data, {bool shouldMerge}))
-      content;
+  final Widget Function(Map, Function(Function())) content;
+  final StoryEvent event;
 
   @override
   _AddEventDialogState createState() => _AddEventDialogState();
@@ -15,15 +20,10 @@ class AddEventDialog extends StatefulWidget {
 class _AddEventDialogState extends State<AddEventDialog> {
   Map eventData = {};
 
-  void _updateEventData(Map data, {bool shouldMerge = true}) {
+  void _updateEventData(Function() updater) {
     setState(() {
-      if (shouldMerge) {
-        eventData.addAll(data);
-      } else {
-        eventData = data;
-      }
+      updater();
     });
-    return;
   }
 
   @override

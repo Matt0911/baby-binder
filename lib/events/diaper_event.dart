@@ -11,25 +11,25 @@ class DiaperEvent extends StoryEvent {
   String note = '';
   late Widget Function(BuildContext context)? buildAddDialog =
       (context) => AddEventDialog(
+          event: this,
           title: EventType.diaper.description,
-          content: (Map eventData, Function updateEventData) => Column(
+          content: (
+            Map eventData,
+            Function(Function()) updateEventData,
+          ) =>
+              Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ToggleButtons(
                     isSelected: [wet && !bm, bm && !wet, wet && bm],
                     borderRadius: BorderRadius.circular(10),
                     onPressed: (selected) {
-                      wet = selected == 0 || selected == 2;
-                      bm = selected == 1 || selected == 2;
-                      if (selected == 0) {
-                        diarrhea = false;
-                      }
-                      updateEventData({
-                        'wet': selected == 0 || selected == 2,
-                        'bm': selected == 1 || selected == 2,
-                        ...(selected == 0 && eventData.containsKey('diarrhea')
-                            ? {'diarrhea': false}
-                            : {})
+                      updateEventData(() {
+                        wet = selected == 0 || selected == 2;
+                        bm = selected == 1 || selected == 2;
+                        if (selected == 0) {
+                          diarrhea = false;
+                        }
                       });
                     },
                     children: [Text('#1'), Text('#2'), Text('Both')],
@@ -41,8 +41,7 @@ class DiaperEvent extends StoryEvent {
                       Switch(
                         value: cream,
                         onChanged: (selected) {
-                          cream = selected;
-                          updateEventData({'cream': selected});
+                          updateEventData(() => cream = selected);
                         },
                       ),
                     ],
@@ -55,8 +54,7 @@ class DiaperEvent extends StoryEvent {
                         value: diarrhea,
                         onChanged: bm
                             ? (selected) {
-                                diarrhea = selected;
-                                updateEventData({'diarrhea': selected});
+                                updateEventData(() => diarrhea = selected);
                               }
                             : null,
                       ),
@@ -69,8 +67,7 @@ class DiaperEvent extends StoryEvent {
                       Expanded(
                         child: TextField(
                           onChanged: (note) {
-                            this.note = note;
-                            updateEventData({'note': note});
+                            updateEventData(() => this.note = note);
                           },
                         ),
                       ),
@@ -86,7 +83,12 @@ class DiaperEvent extends StoryEvent {
         );
 
   DiaperEvent.fromData(Map<String, dynamic> data)
-      : super(
+      : wet = data['wet'],
+        bm = data['bm'],
+        cream = data['cream'],
+        diarrhea = data['diarrhea'],
+        note = data['note'],
+        super(
           eventType: EventType.diaper,
           eventTime: (data['time'] as Timestamp).toDate(),
         );
@@ -101,5 +103,10 @@ class DiaperEvent extends StoryEvent {
   @override
   Map<String, dynamic> convertToMap() => {
         ...super.convertToMap(),
+        'wet': wet,
+        'bm': bm,
+        'cream': cream,
+        'diarrhea': diarrhea,
+        'note': note,
       };
 }

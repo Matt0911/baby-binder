@@ -25,7 +25,7 @@ final childrenDataProvider = ChangeNotifierProvider((ref) => ChildrenData());
 
 class ChildrenData extends ChangeNotifier {
   ChildrenData() {
-    // firestore.clearPersistence();
+    firestore.clearPersistence();
     _init();
   }
 

@@ -1,3 +1,4 @@
+import 'package:baby_binder/events/feeding/feeding_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_chips_input/flutter_chips_input.dart';
 
@@ -22,7 +23,14 @@ const mockResults = <String>[
 ];
 
 class SolidTab extends StatefulWidget {
-  SolidTab({Key? key}) : super(key: key);
+  SolidTab({
+    Key? key,
+    required this.event,
+    required this.updateEventData,
+  }) : super(key: key);
+
+  final FeedingEvent event;
+  final Function(Function()) updateEventData;
 
   @override
   State<SolidTab> createState() => _SolidTabState();
@@ -56,8 +64,9 @@ class _SolidTabState extends State<SolidTab> {
               return const <String>[];
             }
           },
-          onChanged: (data) {
+          onChanged: (List<String> data) {
             setState(() {
+              widget.updateEventData(() => widget.event.solidFoods = data);
               filteredTop =
                   topThree.where((food) => !data.contains(food)).toList();
             });

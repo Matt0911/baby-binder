@@ -1,10 +1,19 @@
+import 'package:baby_binder/constants.dart';
 import 'package:flutter/material.dart';
+import 'dart:core';
 
-import '../../constants.dart';
+import 'feeding_event.dart';
 
 class NursingSideCard extends StatelessWidget {
-  const NursingSideCard({Key? key, required this.text}) : super(key: key);
+  const NursingSideCard({
+    Key? key,
+    required this.text,
+    required this.time,
+    required this.updateValue,
+  }) : super(key: key);
   final String text;
+  final int time;
+  final Function(int) updateValue;
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +33,7 @@ class NursingSideCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               IconButton(
-                onPressed: () => {},
+                onPressed: () => updateValue(-1),
                 icon: Icon(Icons.remove),
               ),
               Column(
@@ -32,13 +41,16 @@ class NursingSideCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    '10',
+                    time.toString(),
                     style: kLargeNumberTextStyle,
                   ),
                   Text('min'),
                 ],
               ),
-              IconButton(onPressed: () => {}, icon: Icon(Icons.add)),
+              IconButton(
+                onPressed: () => updateValue(1),
+                icon: Icon(Icons.add),
+              ),
             ],
           ),
         )
@@ -49,7 +61,13 @@ class NursingSideCard extends StatelessWidget {
 }
 
 class NursingTab extends StatelessWidget {
-  const NursingTab({Key? key}) : super(key: key);
+  const NursingTab({
+    Key? key,
+    required this.event,
+    required this.updateEventData,
+  }) : super(key: key);
+  final FeedingEvent event;
+  final Function(Function()) updateEventData;
 
   @override
   Widget build(BuildContext context) {
@@ -61,11 +79,23 @@ class NursingTab extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
-                child: NursingSideCard(
-              text: 'Left',
-            )),
+              child: NursingSideCard(
+                text: 'Left',
+                time: event.leftTime,
+                updateValue: (delta) => updateEventData(
+                  () => event.leftTime = (event.leftTime + delta).clamp(0, 60),
+                ),
+              ),
+            ),
             Expanded(
-              child: NursingSideCard(text: 'Right'),
+              child: NursingSideCard(
+                text: 'Right',
+                time: event.rightTime,
+                updateValue: (delta) => updateEventData(
+                  () =>
+                      event.rightTime = (event.rightTime + delta).clamp(0, 60),
+                ),
+              ),
             )
           ],
         ),
