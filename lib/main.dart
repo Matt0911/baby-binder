@@ -30,9 +30,11 @@ class BabyBinder extends ConsumerWidget {
     return MaterialApp(
       title: 'Baby Binder',
       theme: ThemeData(
-          colorScheme: ColorScheme.light().copyWith(
-        primary: Colors.teal,
-      )),
+        colorScheme: ColorScheme.light().copyWith(
+          primary: Colors.teal,
+        ),
+        toggleableActiveColor: Colors.teal,
+      ),
       home: LandingFlow(),
       routes: {
         LoginScreen.routeName: (context) {

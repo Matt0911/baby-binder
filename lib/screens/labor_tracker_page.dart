@@ -6,31 +6,114 @@ import 'package:baby_binder/providers/labor_tracker.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
+import 'package:wakelock/wakelock.dart';
 import 'package:timelines/timelines.dart';
 import 'dart:math';
 
-class AveragesDisplay extends StatelessWidget {
-  const AveragesDisplay({Key? key}) : super(key: key);
+String convertSecsToString(int valueInSecs) {
+  final mins = valueInSecs ~/ 60;
+  final secs = valueInSecs % 60;
+  return '${mins > 0 ? '${mins}m ' : ''}${secs > 0 ? '${secs}s' : ''}';
+}
+
+class OneHourAveragesDisplay extends ConsumerWidget {
+  const OneHourAveragesDisplay({Key? key}) : super(key: key);
+
+  @override
+  Widget build(context, ref) {
+    final oneHourData = ref.watch(oneHourLaborDataProvider);
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        SizedBox(height: 10),
+        Text('Last Hour Averages',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.primary,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            )),
+        SizedBox(height: 10),
+        Expanded(
+          child: Row(
+            children: [
+              SizedBox(width: 10),
+              OneHourAverage(
+                  title: 'Duration', valueInSec: oneHourData.durationSeconds),
+              SizedBox(width: 20),
+              OneHourAverage(
+                  title: 'Interval', valueInSec: oneHourData.intervalSeconds),
+              SizedBox(width: 10),
+            ],
+          ),
+        )
+      ],
+    );
+  }
+}
+
+class OneHourAverage extends StatelessWidget {
+  OneHourAverage({
+    Key? key,
+    required this.title,
+    required this.valueInSec,
+  }) : super(key: key);
+
+  final String title;
+  final int valueInSec;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text('1 Hour Averages',
-            style: TextStyle(
-              color: Theme.of(context).colorScheme.primary,
-              fontSize: 28,
-              fontWeight: FontWeight.bold,
-            )),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+    String value = valueInSec > 0 ? convertSecsToString(valueInSec) : '--';
+    return Expanded(
+      child: Card(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Duration'),
-            Text('Interval'),
-            Text('Rest'),
+            Text(
+              value,
+              style: kMedNumberTextStyle,
+            ),
+            Text(
+              title,
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ],
-        )
-      ],
+        ),
+      ),
+    );
+  }
+}
+
+final DateFormat _formatter = DateFormat('EEE MMM d hh:mma');
+
+class DataRow extends StatelessWidget {
+  const DataRow({Key? key, required this.items, this.isBold = false})
+      : super(key: key);
+  final List<String?> items;
+  final bool isBold;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: items
+            .map((text) => Expanded(
+                  child: Center(
+                    child: text != null
+                        ? Text(
+                            text,
+                            style: isBold
+                                ? kDataRowBoldTextStyle
+                                : kDataRowTextStyle,
+                          )
+                        : const SizedBox(),
+                  ),
+                ))
+            .toList(),
+      ),
     );
   }
 }
@@ -41,15 +124,21 @@ class ContractionRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceAround,
-      children: [
-        Text(contraction.start.toString()),
-        contraction.duration != null
-            ? Text('${contraction.duration!.inSeconds}s')
-            : const SizedBox(),
-      ],
-    );
+    return DataRow(items: [
+      _formatter.format(contraction.start),
+      contraction.duration != null
+          ? convertSecsToString(contraction.duration!.inSeconds)
+          : null,
+    ]);
+  }
+}
+
+class TitleRow extends StatelessWidget {
+  const TitleRow({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return DataRow(items: ['Time', 'Duration'], isBold: true);
   }
 }
 
@@ -124,17 +213,18 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Expanded(
+          //     flex: 2,
+          //     child: Container(
+          //       color: Colors.blue,
+          //     )),
           Expanded(
-              flex: 2,
-              child: Container(
-                color: Colors.blue,
-              )),
-          Expanded(
-            flex: 2,
-            child: AveragesDisplay(),
+            flex: 1,
+            child: OneHourAveragesDisplay(),
           ),
+          TitleRow(),
           Expanded(
-            flex: 3,
+            flex: 4,
             child: ListView.builder(
               itemCount: laborData.contractions.length,
               itemBuilder: (context, i) => ContractionRow(
@@ -150,8 +240,10 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
                   if (currentContraction == null) {
                     currentContraction = Contraction();
                     widget.stopwatch.start();
+                    Wakelock.enable();
                   } else {
                     widget.stopwatch.stop();
+                    Wakelock.disable();
                     currentContraction!.duration = widget.stopwatch.elapsed;
                     laborData.addNewContraction(currentContraction!);
                     widget.stopwatch.reset();

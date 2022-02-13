@@ -191,6 +191,7 @@ class _FeedingDialogContentState extends State<FeedingDialogContent>
               Tab(text: 'Solids')
             ],
             controller: _tabController,
+            indicatorColor: Colors.teal.shade200,
             labelColor: Colors.teal,
             labelStyle: TextStyle(fontWeight: FontWeight.bold),
             unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),

@@ -15,27 +15,34 @@ class LaborTrackerData extends ChangeNotifier {
       : _document = activeChildDocument {
     if (_document != null) {
       _document!.collection('labor').orderBy('time').snapshots().listen(
-            (snapshot) => snapshot.docChanges.forEach(
-              (docChange) {
-                if (docChange.type == DocumentChangeType.added) {
-                  contractions.insert(
-                      0,
-                      Contraction.fromData(
-                          docChange.doc.id, docChange.doc.data() ?? {}));
-                } else if (docChange.type == DocumentChangeType.removed) {
-                  contractions.removeWhere((c) => c.id == docChange.doc.id);
-                }
-                notifyListeners();
-              },
-            ),
+        (snapshot) {
+          snapshot.docChanges.forEach(
+            (docChange) {
+              if (docChange.type == DocumentChangeType.added) {
+                _addContraction(docChange.doc.id, docChange.doc.data() ?? {});
+              } else if (docChange.type == DocumentChangeType.removed) {
+                _removeContraction(docChange.doc.id);
+              }
+            },
           );
+          notifyListeners();
+        },
+      );
     }
   }
 
   List<Contraction> contractions = [];
   DocumentReference<Map<String, dynamic>>? _document;
 
-  void _addEvent(Contraction c) {
+  void _removeContraction(String id) {
+    contractions.removeWhere((c) => c.id == id);
+  }
+
+  void _addContraction(String id, Map<String, dynamic> data) {
+    contractions.insert(0, Contraction.fromData(id, data));
+  }
+
+  void _createContraction(Contraction c) {
     // _events.insert(0, event);
     if (_document != null) {
       _document!.collection('labor').add(c.convertToMap());
@@ -43,7 +50,7 @@ class LaborTrackerData extends ChangeNotifier {
   }
 
   void addNewContraction(Contraction c) async {
-    _addEvent(c);
+    _createContraction(c);
   }
 }
 
@@ -54,6 +61,7 @@ class Contraction {
 
   Contraction.fromData(String id, Map<String, dynamic> data)
       : _start = (data['time'] as Timestamp).toDate(),
+        this.id = id,
         duration = Duration(seconds: data['durationSeconds']);
 
   String? id;
@@ -65,4 +73,60 @@ class Contraction {
         'time': start,
         'durationSeconds': duration!.inSeconds,
       };
+}
+
+final oneHourLaborDataProvider = Provider((ref) {
+  final contractions = ref.watch(laborTrackerDataProvider).contractions;
+  List<Contraction> oneHourContractions = contractions
+      .where(
+          (c) => c.start.isAfter(DateTime.now().subtract(Duration(hours: 1))))
+      .toList();
+  int durationTot = 0, intervalTot = 0, restTot = 0;
+  int len = oneHourContractions.length;
+  if (len == 0) {
+    return OneHourLaborData(
+      contractions: oneHourContractions,
+      durationSeconds: -1,
+      intervalSeconds: -1,
+      restSeconds: -1,
+    );
+  }
+  if (len > 1) {
+    for (int i = 0; i < len; i++) {
+      Contraction cur = oneHourContractions[i];
+      durationTot += cur.duration!.inSeconds;
+      if (i < len - 1) {
+        Contraction prev = oneHourContractions[i + 1];
+        intervalTot += cur.start.difference(prev.start).inSeconds;
+        restTot +=
+            cur.start.difference(prev.start.add(prev.duration!)).inSeconds;
+      }
+    }
+  } else {
+    durationTot = oneHourContractions[0].duration!.inSeconds;
+    intervalTot = -1;
+    restTot = -1;
+  }
+  int durationAvg = (durationTot / len).round();
+  int intervalAvg = len > 1 ? (intervalTot / (len - 1)).round() : -1;
+  int restAvg = len > 1 ? (restTot / (len - 1)).round() : -1;
+  return OneHourLaborData(
+    contractions: oneHourContractions,
+    durationSeconds: durationAvg,
+    intervalSeconds: intervalAvg,
+    restSeconds: restAvg,
+  );
+});
+
+class OneHourLaborData {
+  OneHourLaborData({
+    required this.durationSeconds,
+    required this.intervalSeconds,
+    required this.restSeconds,
+    required this.contractions,
+  });
+  final int durationSeconds;
+  final int intervalSeconds;
+  final int restSeconds;
+  final List<Contraction> contractions;
 }
