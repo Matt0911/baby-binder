@@ -19,7 +19,7 @@ class ChildSettingsPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final childData = ref.watch(childrenDataProvider);
+    final activeChild = ref.watch(activeChildProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Baby Binder'),
@@ -32,12 +32,11 @@ class ChildSettingsPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ChildAvatar(
-                imageUrl: childData.activeChild!.image,
-                name: childData.activeChild!.name,
+                child: activeChild!,
               ),
             ),
             ElevatedButton(
-                onPressed: () => childData.activeChild!.updateName('Testing'),
+                onPressed: () => activeChild.updateName('Testing'),
                 child: Text('Update Name')),
             Expanded(
                 flex: 1,

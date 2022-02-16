@@ -17,7 +17,7 @@ class BabyBinderDrawer extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     String currentRoute = ModalRoute.of(context)!.settings.name ?? 'test';
-    final activeChild = ref.watch(childrenDataProvider).activeChild;
+    final activeChild = ref.watch(activeChildProvider);
     final authState = ref.watch(authStateProvider);
     return Drawer(
       child: ListView(
@@ -25,11 +25,14 @@ class BabyBinderDrawer extends ConsumerWidget {
           DrawerHeader(
             child: Column(
               children: [
-                ChildAvatar(
-                  imageUrl: activeChild!.image,
-                  name: activeChild.name,
-                  maxRadius: 25,
-                ),
+                ...(activeChild != null
+                    ? [
+                        ChildAvatar(
+                          child: activeChild,
+                          maxRadius: 25,
+                        ),
+                      ]
+                    : []),
                 TextButton.icon(
                   onPressed: () => Navigator.pushNamed(
                       context, ChildSelectionPage.routeName),

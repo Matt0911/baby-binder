@@ -18,11 +18,11 @@ class ChildCard extends ConsumerWidget {
         child: Column(
           children: [
             Expanded(
-                child: ChildAvatar(
-              imageUrl: childData.image,
-              name: childData.name,
-              maxRadius: MediaQuery.of(context).size.width / 3,
-            )),
+              child: ChildAvatar(
+                child: childData,
+                maxRadius: MediaQuery.of(context).size.width / 3,
+              ),
+            ),
             ElevatedButton(
               onPressed: () async {
                 await setActiveChild(id: childData.id);
