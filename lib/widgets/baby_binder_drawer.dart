@@ -28,7 +28,8 @@ class BabyBinderDrawer extends ConsumerWidget {
                 ...(activeChild != null
                     ? [
                         ChildAvatar(
-                          child: activeChild,
+                          childImage: activeChild.image,
+                          childName: activeChild.name,
                           maxRadius: 25,
                         ),
                       ]

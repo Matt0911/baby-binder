@@ -32,12 +32,11 @@ class ChildSettingsPage extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: ChildAvatar(
-                child: activeChild!,
+                childImage: activeChild!.image,
+                childName: activeChild.name,
+                updateName: activeChild.updateName,
               ),
             ),
-            ElevatedButton(
-                onPressed: () => activeChild.updateName('Testing'),
-                child: Text('Update Name')),
             Expanded(
                 flex: 1,
                 child: Column(children: [

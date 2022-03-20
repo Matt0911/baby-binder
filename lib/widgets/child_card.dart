@@ -11,7 +11,7 @@ class ChildCard extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final setActiveChild = ref.read(childrenDataProvider).setActiveChild;
+    final setActiveChild = ref.watch(childrenDataProvider).setActiveChild;
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -19,20 +19,23 @@ class ChildCard extends ConsumerWidget {
           children: [
             Expanded(
               child: ChildAvatar(
-                child: childData,
+                childImage: childData.image,
+                childName: childData.name,
                 maxRadius: MediaQuery.of(context).size.width / 3,
               ),
             ),
             ElevatedButton(
-              onPressed: () async {
-                await setActiveChild(id: childData.id);
+              onPressed: () {
+                setActiveChild(id: childData.id);
                 Navigator.pushNamed(context, ChildStoryPage.routeName);
               },
               child: Text('View Story'),
             ),
             OutlinedButton(
-              onPressed: () =>
-                  Navigator.pushNamed(context, ChildSettingsPage.routeName),
+              onPressed: () {
+                setActiveChild(id: childData.id);
+                Navigator.pushNamed(context, ChildSettingsPage.routeName);
+              },
               child: Text('Settings'),
             )
           ],

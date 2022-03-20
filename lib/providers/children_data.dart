@@ -45,6 +45,7 @@ class ChildrenData extends ChangeNotifier {
                 final addedChild =
                     Child(docChange.doc.id, docChange.doc.data());
                 _children.add(addedChild);
+                _childrenDataMaps[docChange.doc.id] = docChange.doc.data();
                 if (initialSavedChildId != null &&
                     initialSavedChildId == addedChild._id &&
                     activeChild == null) {
@@ -52,10 +53,13 @@ class ChildrenData extends ChangeNotifier {
                 }
               } else if (docChange.type == DocumentChangeType.removed) {
                 _children.removeWhere((c) => c.id == docChange.doc.id);
+                _childrenDataMaps.remove(docChange.doc.id);
               } else if (docChange.type == DocumentChangeType.modified) {
+                print('modified $docChange');
                 _children
                     .firstWhere((element) => element.id == docChange.doc.id)
                     ._updateData(docChange.doc.data());
+                _childrenDataMaps[docChange.doc.id] = docChange.doc.data();
               }
             });
             notifyListeners();
@@ -71,8 +75,8 @@ class ChildrenData extends ChangeNotifier {
   }
 
   setActiveChild({required String id}) async {
-    if (activeChild == null || id != activeChild?.id) {
-      activeChild = _children.firstWhere((child) => child.id == id);
+    if (activeChild == null || id != activeChild) {
+      activeChild = id;
       prefs.setString('activeChild', id);
       notifyListeners();
     }
@@ -82,12 +86,17 @@ class ChildrenData extends ChangeNotifier {
   StreamSubscription<QuerySnapshot>? _childrenListSubscription;
   List<Child> _children = [];
   List<Child> get children => _children;
-  Child? activeChild;
+  Map<String, Map<String, dynamic>?> _childrenDataMaps = {};
+  String? activeChild;
 }
 
 final activeChildProvider = Provider((ref) {
   final childrenData = ref.watch(childrenDataProvider);
-  return childrenData.activeChild;
+  if (childrenData.activeChild == null) {
+    return null;
+  }
+  return Child(childrenData.activeChild!,
+      childrenData._childrenDataMaps[childrenData.activeChild]);
 });
 
 final DateFormat _formatter = DateFormat();

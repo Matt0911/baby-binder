@@ -15,8 +15,7 @@ class ChildStoryPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final childdata = ref.watch(childrenDataProvider);
-    Child? activeChild = childdata.activeChild;
+    Child? activeChild = ref.watch(activeChildProvider);
     return Scaffold(
       appBar: AppBar(title: Text('${activeChild!.name}\'s Story')),
       drawer: BabyBinderDrawer(),
@@ -186,7 +185,7 @@ class _AddEventButtonsState extends ConsumerState<AddEventButtons> {
 
   @override
   Widget build(BuildContext context) {
-    final activeChild = ref.watch(childrenDataProvider).activeChild;
+    final activeChild = ref.watch(activeChildProvider);
     final story = ref.watch(storyDataProvider);
     return Material(
       color: Colors.teal[300],
