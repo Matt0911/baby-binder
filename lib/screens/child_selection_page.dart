@@ -1,6 +1,5 @@
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
-import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:baby_binder/widgets/child_card.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
@@ -13,7 +12,7 @@ class ChildSelectionPage extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final childData = ref.watch(childrenDataProvider);
+    final children = ref.watch(childrenListProvider);
     return Scaffold(
       appBar: AppBar(
         title: const Text('Children'),
@@ -27,7 +26,7 @@ class ChildSelectionPage extends ConsumerWidget {
                   aspectRatio: 3 / 4,
                   enableInfiniteScroll: false,
                 ),
-                items: childData.children.map((child) {
+                items: children.map((child) {
                   return Builder(
                     builder: (BuildContext context) {
                       return Container(

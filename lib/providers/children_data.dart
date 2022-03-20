@@ -41,33 +41,29 @@ class ChildrenData extends ChangeNotifier {
             .listen(
           (snapshot) {
             snapshot.docChanges.forEach((docChange) {
+              String childId = docChange.doc.id;
               if (docChange.type == DocumentChangeType.added) {
-                final addedChild =
-                    Child(docChange.doc.id, docChange.doc.data());
-                _children.add(addedChild);
-                _childrenDataMaps[docChange.doc.id] = docChange.doc.data();
+                children.add(childId);
+                _childrenDataMaps[childId] = docChange.doc.data();
                 if (initialSavedChildId != null &&
-                    initialSavedChildId == addedChild._id &&
-                    activeChild == null) {
+                    initialSavedChildId == childId &&
+                    activeChildId == null) {
                   setActiveChild(id: initialSavedChildId);
                 }
               } else if (docChange.type == DocumentChangeType.removed) {
-                _children.removeWhere((c) => c.id == docChange.doc.id);
-                _childrenDataMaps.remove(docChange.doc.id);
+                children.removeWhere((c) => c == childId);
+                _childrenDataMaps.remove(childId);
               } else if (docChange.type == DocumentChangeType.modified) {
                 print('modified $docChange');
-                _children
-                    .firstWhere((element) => element.id == docChange.doc.id)
-                    ._updateData(docChange.doc.data());
-                _childrenDataMaps[docChange.doc.id] = docChange.doc.data();
+                _childrenDataMaps[childId] = docChange.doc.data();
               }
             });
             notifyListeners();
           },
         );
       } else {
-        _children = [];
-        activeChild = null;
+        children = [];
+        activeChildId = null;
         _childrenListSubscription?.cancel();
         notifyListeners();
       }
@@ -75,8 +71,8 @@ class ChildrenData extends ChangeNotifier {
   }
 
   setActiveChild({required String id}) async {
-    if (activeChild == null || id != activeChild) {
-      activeChild = id;
+    if (activeChildId == null || id != activeChildId) {
+      activeChildId = id;
       prefs.setString('activeChild', id);
       notifyListeners();
     }
@@ -84,19 +80,35 @@ class ChildrenData extends ChangeNotifier {
 
   late SharedPreferences prefs;
   StreamSubscription<QuerySnapshot>? _childrenListSubscription;
-  List<Child> _children = [];
-  List<Child> get children => _children;
+  List<String> children = [];
   Map<String, Map<String, dynamic>?> _childrenDataMaps = {};
-  String? activeChild;
+  String? activeChildId;
 }
 
-final activeChildProvider = Provider((ref) {
+final activeChildIdProvider = Provider((ref) {
   final childrenData = ref.watch(childrenDataProvider);
-  if (childrenData.activeChild == null) {
+  return childrenData.activeChildId;
+});
+
+final activeChildDataProvider = Provider((ref) {
+  final childrenData = ref.watch(childrenDataProvider);
+  return childrenData._childrenDataMaps[childrenData.activeChildId];
+});
+
+final activeChildProvider = Provider((ref) {
+  final activeChildId = ref.watch(activeChildIdProvider);
+  final activeChildData = ref.watch(activeChildDataProvider);
+  if (activeChildId == null) {
     return null;
   }
-  return Child(childrenData.activeChild!,
-      childrenData._childrenDataMaps[childrenData.activeChild]);
+  return Child(activeChildId, activeChildData);
+});
+
+final childrenListProvider = Provider((ref) {
+  final childrenData = ref.watch(childrenDataProvider);
+  return childrenData.children
+      .map((id) => Child(id, childrenData._childrenDataMaps[id]))
+      .toList();
 });
 
 final DateFormat _formatter = DateFormat();
