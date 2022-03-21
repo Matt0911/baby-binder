@@ -26,7 +26,7 @@ class ChildAvatar extends StatelessWidget {
         // crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
-            backgroundImage: AssetImage(childImage),
+            backgroundImage: NetworkImage(childImage),
             minRadius: 25,
             maxRadius: maxRadius,
           ),
@@ -58,33 +58,44 @@ class NameDisplay extends StatelessWidget {
         padding: const EdgeInsets.only(top: 8, bottom: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.max,
           children: [
-            Text(
-              childName,
-              style: TextStyle(fontSize: 20, color: kGreyTextColor),
-            ),
-            updateName != null
-                ? IconButton(
-                    onPressed: () async {
-                      TextFieldEditResults? results =
-                          await showTextFieldBottomSheet(
-                        context,
-                        'Name',
-                        childName,
-                      );
-                      if (results != null &&
-                          results.didSave &&
-                          results.value != childName) {
-                        print('got ${results.value} from modal');
-                        updateName!(results.value!);
-                      }
-                      // setState(() {
-                      //   isEditing = !isEditing;
-                      // });
-                    },
-                    icon: Icon(Icons.edit),
-                  )
-                : SizedBox()
+            Expanded(
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Text(
+                    childName,
+                    style: TextStyle(fontSize: 20, color: kGreyTextColor),
+                  ),
+                  updateName != null
+                      ? Positioned(
+                          right: 0,
+                          child: IconButton(
+                            onPressed: () async {
+                              TextFieldEditResults? results =
+                                  await showTextFieldBottomSheet(
+                                context,
+                                'Name',
+                                childName,
+                              );
+                              if (results != null &&
+                                  results.didSave &&
+                                  results.value != childName) {
+                                print('got ${results.value} from modal');
+                                updateName!(results.value!);
+                              }
+                              // setState(() {
+                              //   isEditing = !isEditing;
+                              // });
+                            },
+                            icon: Icon(Icons.edit),
+                          ),
+                        )
+                      : SizedBox()
+                ],
+              ),
+            )
           ],
         ));
   }

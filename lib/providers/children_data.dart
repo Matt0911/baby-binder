@@ -7,19 +7,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-Map<int, dynamic> children = {
-  1: {
-    'name': 'Elliott',
-    'image': 'images/Elliott.jpg',
-  },
-  2: {
-    'name': 'Elinor',
-    'image': 'images/Elinor.jpg',
-  }
-};
+import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
+final firebase_storage.FirebaseStorage storage =
+    firebase_storage.FirebaseStorage.instance;
 
 final childrenDataProvider = ChangeNotifierProvider((ref) => ChildrenData());
 
@@ -147,11 +139,20 @@ class Child {
   late bool isSleeping;
 
   DateTime? birthdate;
-  bool get isBorn => birthdate != null;
+  bool get isBorn =>
+      birthdate != null && birthdate!.compareTo(DateTime.now()) <= 0;
 
   StoryData? story;
 
   void updateName(String name) {
     document.update({'name': name});
+  }
+
+  void updateBirthDate(DateTime? birth) {
+    print('updating birth: $birth');
+    document.update({
+      'birthdate':
+          birth == null ? FieldValue.delete() : Timestamp.fromDate(birth)
+    });
   }
 }

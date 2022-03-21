@@ -3,19 +3,10 @@ import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:baby_binder/widgets/child_avatar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 class ChildSettingsPage extends ConsumerWidget {
   static final String routeName = '/child-settings-page';
-
-  Widget _buildSettingRow(String name, String value) {
-    const double fontSize = 18;
-
-    return SettingRow(
-      fontSize: fontSize,
-      settingName: name,
-      settingValue: value,
-    );
-  }
 
   @override
   Widget build(context, ref) {
@@ -39,10 +30,28 @@ class ChildSettingsPage extends ConsumerWidget {
             ),
             Expanded(
                 flex: 1,
-                child: Column(children: [
-                  _buildSettingRow('setting name', 'values'),
-                  _buildSettingRow('setting name 2', 'value 2')
-                ])),
+                child: Column(
+                  children: [
+                    DateSettingRow(
+                      settingName: 'Birth Date',
+                      settingValue: activeChild.birthdate,
+                      updateValue: activeChild.updateBirthDate,
+                    ),
+                    activeChild.birthdate != null &&
+                            DateTime(
+                                  activeChild.birthdate!.year,
+                                  activeChild.birthdate!.month,
+                                  activeChild.birthdate!.day,
+                                ).compareTo(DateTime.now()) <=
+                                0
+                        ? TimeSettingRow(
+                            settingName: 'Birth Time',
+                            settingValue: activeChild.birthdate!,
+                            updateValue: activeChild.updateBirthDate,
+                          )
+                        : SizedBox(),
+                  ],
+                )),
             // OutlinedButton(
             //   child: Text(
             //     'View Story',
@@ -54,6 +63,118 @@ class ChildSettingsPage extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy');
+final DateFormat _timeFormatter = DateFormat('hh:mm a');
+
+class DateSettingRow extends StatelessWidget {
+  const DateSettingRow({
+    Key? key,
+    this.fontSize = 18,
+    required this.settingName,
+    required this.settingValue,
+    required this.updateValue,
+  }) : super(key: key);
+
+  final double fontSize;
+  final String settingName;
+  final DateTime? settingValue;
+  final Function(DateTime?) updateValue;
+
+  @override
+  Widget build(context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          child: Text(
+            settingName,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        MaterialButton(
+          visualDensity: VisualDensity.compact,
+          onPressed: () async {
+            DateTime now = DateTime.now();
+            final selected = await showDatePicker(
+              context: context,
+              initialDate: now,
+              firstDate: DateTime.utc(2000),
+              lastDate: now.add(Duration(days: 280)),
+            );
+            if (selected == null) return;
+            updateValue(selected);
+          },
+          child: Text(
+            settingValue == null ? 'Set' : _dateFormatter.format(settingValue!),
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class TimeSettingRow extends StatelessWidget {
+  const TimeSettingRow({
+    Key? key,
+    this.fontSize = 18,
+    required this.settingName,
+    required this.settingValue,
+    required this.updateValue,
+  }) : super(key: key);
+
+  final double fontSize;
+  final String settingName;
+  final DateTime settingValue;
+  final Function(DateTime?) updateValue;
+
+  @override
+  Widget build(context) {
+    return Row(
+      mainAxisSize: MainAxisSize.max,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          child: Text(
+            settingName,
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ),
+        MaterialButton(
+          visualDensity: VisualDensity.compact,
+          onPressed: () async {
+            final selected = await showTimePicker(
+              context: context,
+              initialTime: TimeOfDay.fromDateTime(settingValue),
+            );
+            print('selected $selected');
+            if (selected == null) return;
+            updateValue(new DateTime(settingValue.year, settingValue.month,
+                settingValue.day, selected.hour, selected.minute));
+          },
+          child: Text(
+            _timeFormatter.format(settingValue),
+            style: TextStyle(
+              fontSize: fontSize,
+              fontWeight: FontWeight.w300,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
