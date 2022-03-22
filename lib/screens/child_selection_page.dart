@@ -42,7 +42,8 @@ class ChildSelectionPage extends ConsumerWidget {
           ),
           Center(
             child: TextButton.icon(
-                onPressed: () => print('pressed button'),
+                onPressed: () => print(
+                    'add child not yet implemented'), //TODO: implement add child functionality
                 label: Text('Add Child'),
                 icon: Icon(Icons.add)),
           )

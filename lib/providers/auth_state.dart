@@ -1,4 +1,6 @@
+import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/login_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth.dart';
 
 final authStateProvider = ChangeNotifierProvider((ref) => AuthState());
+final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 class AuthState extends ChangeNotifier {
   AuthState() {
@@ -18,9 +21,6 @@ class AuthState extends ChangeNotifier {
     FirebaseAuth.instance.userChanges().listen((user) {
       if (user != null) {
         _loginState = ApplicationLoginState.loggedIn;
-        // if (context != null)
-        //   Navigator.pushReplacementNamed(
-        //       context!, ChildSelectionPage.routeName);
       } else {
         _loginState = ApplicationLoginState.loggedOut;
       }
@@ -72,6 +72,7 @@ class AuthState extends ChangeNotifier {
         email: email,
         password: password,
       );
+      Navigator.of(context).pushNamed(ChildSelectionPage.routeName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
@@ -93,6 +94,13 @@ class AuthState extends ChangeNotifier {
       var credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateDisplayName(displayName);
+
+      await firestore.collection('users').doc(credential.user!.uid).set({
+        'name': displayName,
+        'children': [],
+        'email': email,
+      });
+      Navigator.of(context).pushNamed(ChildSelectionPage.routeName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }

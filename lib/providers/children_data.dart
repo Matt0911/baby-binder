@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:baby_binder/providers/story_data.dart';
+import 'package:baby_binder/providers/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -13,53 +13,55 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 final firebase_storage.FirebaseStorage storage =
     firebase_storage.FirebaseStorage.instance;
 
-final childrenDataProvider = ChangeNotifierProvider((ref) => ChildrenData());
+final childrenDataProvider =
+    ChangeNotifierProvider((ref) => ChildrenData(ref.watch(userDataProvider)));
 
 class ChildrenData extends ChangeNotifier {
-  ChildrenData() {
-    firestore.clearPersistence();
+  ChildrenData(this.userData) {
+    // firestore.clearPersistence();
     _init();
   }
 
+  UserData userData;
+
   _init() async {
     prefs = await SharedPreferences.getInstance();
-    FirebaseAuth.instance.userChanges().listen((user) {
-      if (user != null) {
-        final initialSavedChildId = prefs.getString('activeChild');
-        _childrenListSubscription = firestore
-            .collection('children')
-            // .where(field) TODO: only children with user ID
-            .snapshots()
-            .listen(
-          (snapshot) {
-            snapshot.docChanges.forEach((docChange) {
-              String childId = docChange.doc.id;
-              if (docChange.type == DocumentChangeType.added) {
-                children.add(childId);
-                _childrenDataMaps[childId] = docChange.doc.data();
-                if (initialSavedChildId != null &&
-                    initialSavedChildId == childId &&
-                    activeChildId == null) {
-                  setActiveChild(id: initialSavedChildId);
-                }
-              } else if (docChange.type == DocumentChangeType.removed) {
-                children.removeWhere((c) => c == childId);
-                _childrenDataMaps.remove(childId);
-              } else if (docChange.type == DocumentChangeType.modified) {
-                print('modified $docChange');
-                _childrenDataMaps[childId] = docChange.doc.data();
+
+    if (userData.isLoaded && userData.children.length > 0) {
+      final initialSavedChildId = prefs.getString('activeChild');
+      _childrenListSubscription = firestore
+          .collection('children')
+          .where(FieldPath.documentId, whereIn: userData.children)
+          .snapshots()
+          .listen(
+        (snapshot) {
+          snapshot.docChanges.forEach((docChange) {
+            String childId = docChange.doc.id;
+            if (docChange.type == DocumentChangeType.added) {
+              children.add(childId);
+              _childrenDataMaps[childId] = docChange.doc.data();
+              if (initialSavedChildId != null &&
+                  initialSavedChildId == childId &&
+                  activeChildId == null) {
+                setActiveChild(id: initialSavedChildId);
               }
-            });
-            notifyListeners();
-          },
-        );
-      } else {
-        children = [];
-        activeChildId = null;
-        _childrenListSubscription?.cancel();
-        notifyListeners();
-      }
-    });
+            } else if (docChange.type == DocumentChangeType.removed) {
+              children.removeWhere((c) => c == childId);
+              _childrenDataMaps.remove(childId);
+            } else if (docChange.type == DocumentChangeType.modified) {
+              print('modified $docChange');
+              _childrenDataMaps[childId] = docChange.doc.data();
+            }
+          });
+          notifyListeners();
+        },
+      );
+    } else {
+      children = [];
+      activeChildId = null;
+      _childrenListSubscription?.cancel();
+      notifyListeners();
+    }
   }
 
   setActiveChild({required String id}) async {
