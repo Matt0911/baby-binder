@@ -81,11 +81,33 @@ class ChildStory extends ConsumerWidget {
                   connectionDirection: ConnectionDirection.after,
                   contentsAlign: ContentsAlign.basic,
                   contentsBuilder: (context, index) => Align(
-                      alignment: AlignmentDirectional.topStart,
-                      child: Text(events[index].eventType.description)),
+                    alignment: AlignmentDirectional.topStart,
+                    child: Container(
+                      padding: const EdgeInsets.only(left: 10),
+                      constraints: BoxConstraints(minHeight: 40, maxHeight: 40),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text(
+                          events[index].eventType.description,
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ),
+                    ),
+                  ),
                   oppositeContentsBuilder: (context, index) => Align(
-                      alignment: AlignmentDirectional.topEnd,
-                      child: Text(events[index].getFormattedTime())),
+                    alignment: AlignmentDirectional.topEnd,
+                    child: Container(
+                      padding: const EdgeInsets.only(right: 10),
+                      constraints: BoxConstraints(minHeight: 40, maxHeight: 40),
+                      child: Center(
+                        widthFactor: 1,
+                        child: Text(
+                          events[index].getFormattedTime(),
+                          style: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ),
+                  ),
                   // nodePositionBuilder: (context, index) => 0.4,
                   // indicatorPositionBuilder: (context, index) => 0.0,
                   connectorBuilder: (context, index, connectorType) {
@@ -102,7 +124,7 @@ class ChildStory extends ConsumerWidget {
                     );
                   },
                   itemExtentBuilder: (context, index) {
-                    const double base = 30;
+                    const double base = 55;
                     if (index == events.length - 1) return base;
 
                     DateTime curTime = events[index].getLocalTime();
@@ -114,8 +136,14 @@ class ChildStory extends ConsumerWidget {
                   indicatorPositionBuilder: (context, index) => 0,
                   indicatorBuilder: (context, index) {
                     EventType type = events[index].eventType;
-                    return DotIndicator(
-                      color: type.iconColor,
+                    return GestureDetector(
+                      onLongPress: () =>
+                          story.editEvent(events[index], context),
+                      child: DotIndicator(
+                        color: type.iconColor,
+                        size: 40,
+                        child: Icon(type.icon, color: type.backgroundColor),
+                      ),
                     );
                   },
                   itemCount: events.length,

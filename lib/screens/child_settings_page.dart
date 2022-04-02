@@ -1,9 +1,10 @@
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:baby_binder/widgets/child_avatar.dart';
+import 'package:baby_binder/widgets/date_picker_row.dart';
+import 'package:baby_binder/widgets/time_picker_row.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 
 class ChildSettingsPage extends ConsumerWidget {
   static final String routeName = '/child-settings-page';
@@ -32,7 +33,7 @@ class ChildSettingsPage extends ConsumerWidget {
                 flex: 1,
                 child: Column(
                   children: [
-                    DateSettingRow(
+                    DatePickerRow(
                       settingName: 'Birth Date',
                       settingValue: activeChild.birthdate,
                       updateValue: activeChild.updateBirthDate,
@@ -44,7 +45,7 @@ class ChildSettingsPage extends ConsumerWidget {
                                   activeChild.birthdate!.day,
                                 ).compareTo(DateTime.now()) <=
                                 0
-                        ? TimeSettingRow(
+                        ? TimePickerRow(
                             settingName: 'Birth Time',
                             settingValue: activeChild.birthdate!,
                             updateValue: activeChild.updateBirthDate,
@@ -63,118 +64,6 @@ class ChildSettingsPage extends ConsumerWidget {
           ],
         ),
       ),
-    );
-  }
-}
-
-final DateFormat _dateFormatter = DateFormat('MMM dd, yyyy');
-final DateFormat _timeFormatter = DateFormat('hh:mm a');
-
-class DateSettingRow extends StatelessWidget {
-  const DateSettingRow({
-    Key? key,
-    this.fontSize = 18,
-    required this.settingName,
-    required this.settingValue,
-    required this.updateValue,
-  }) : super(key: key);
-
-  final double fontSize;
-  final String settingName;
-  final DateTime? settingValue;
-  final Function(DateTime?) updateValue;
-
-  @override
-  Widget build(context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          child: Text(
-            settingName,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        MaterialButton(
-          visualDensity: VisualDensity.compact,
-          onPressed: () async {
-            DateTime now = DateTime.now();
-            final selected = await showDatePicker(
-              context: context,
-              initialDate: now,
-              firstDate: DateTime.utc(2000),
-              lastDate: now.add(Duration(days: 280)),
-            );
-            if (selected == null) return;
-            updateValue(selected);
-          },
-          child: Text(
-            settingValue == null ? 'Set' : _dateFormatter.format(settingValue!),
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class TimeSettingRow extends StatelessWidget {
-  const TimeSettingRow({
-    Key? key,
-    this.fontSize = 18,
-    required this.settingName,
-    required this.settingValue,
-    required this.updateValue,
-  }) : super(key: key);
-
-  final double fontSize;
-  final String settingName;
-  final DateTime settingValue;
-  final Function(DateTime?) updateValue;
-
-  @override
-  Widget build(context) {
-    return Row(
-      mainAxisSize: MainAxisSize.max,
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Container(
-          child: Text(
-            settingName,
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
-        ),
-        MaterialButton(
-          visualDensity: VisualDensity.compact,
-          onPressed: () async {
-            final selected = await showTimePicker(
-              context: context,
-              initialTime: TimeOfDay.fromDateTime(settingValue),
-            );
-            print('selected $selected');
-            if (selected == null) return;
-            updateValue(new DateTime(settingValue.year, settingValue.month,
-                settingValue.day, selected.hour, selected.minute));
-          },
-          child: Text(
-            _timeFormatter.format(settingValue),
-            style: TextStyle(
-              fontSize: fontSize,
-              fontWeight: FontWeight.w300,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

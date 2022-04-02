@@ -3,7 +3,7 @@ import 'package:baby_binder/events/feeding/feeding_event.dart';
 import 'package:baby_binder/events/sleep_events.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'add_event_dialog.dart';
+import 'event_dialog.dart';
 
 const kDiaperEventKey = 'diaper';
 const kStartedSleepingEventKey = 'started_sleeping';
@@ -98,32 +98,40 @@ final DateFormat _formatter = DateFormat('MMM dd hh:mm a');
 
 abstract class StoryEvent {
   final EventType eventType;
-  final DateTime eventTime;
-  Widget Function(BuildContext context)? buildAddDialog;
+  DateTime eventTime;
+  Widget Function(BuildContext context, {bool isEdit})? buildDialog;
 
   StoryEvent(
-      {required this.eventType, required this.eventTime, this.buildAddDialog});
+      {required this.eventType,
+      required this.eventTime,
+      this.buildDialog,
+      this.id});
 
-  String? _id;
-  String? get id => _id;
+  String? id;
   String getFormattedTime() => _formatter.format(eventTime.toLocal());
   DateTime getLocalTime() => eventTime.toLocal();
+  void updateDate(DateTime? date) {
+    if (date != null) {
+      eventTime = date;
+    }
+  }
+
   Map<String, dynamic> convertToMap() => {
         'type': eventType.type,
         'time': eventTime,
       };
 }
 
-StoryEvent createEventFromData(Map<String, dynamic> data) {
+StoryEvent createEventFromData(Map<String, dynamic> data, String id) {
   switch (data['type']) {
     case kDiaperEventKey:
-      return DiaperEvent.fromData(data);
+      return DiaperEvent.fromData(data, id);
     case kStartedSleepingEventKey:
-      return StartSleepEvent.fromData(data);
+      return StartSleepEvent.fromData(data, id);
     case kEndedSleepingEventKey:
-      return EndSleepEvent.fromData(data);
+      return EndSleepEvent.fromData(data, id);
     case kFeedingEventKey:
-      return FeedingEvent.fromData(data);
+      return FeedingEvent.fromData(data, id);
     default:
       throw Exception('Invalid event type');
   }

@@ -1,4 +1,4 @@
-import 'package:baby_binder/events/add_event_dialog.dart';
+import 'package:baby_binder/events/event_dialog.dart';
 import 'package:baby_binder/events/story_events.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -57,14 +57,12 @@ class FeedingEvent extends StoryEvent {
   // solids data
   List<String> solidFoods = [];
 
-  late Widget Function(BuildContext context)? buildAddDialog =
-      (context) => AddEventDialog(
-            event: this,
+  late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
+      (context, {isEdit = false}) => EventDialog(
             title: EventType.feeding.description,
-            content: (
-              Map eventData,
-              Function(Function()) updateEventData,
-            ) =>
+            isEdit: isEdit,
+            event: this,
+            content: (Function(Function()) updateEventData) =>
                 FeedingDialogContent(
               event: this,
               updateEventData: updateEventData,
@@ -77,7 +75,7 @@ class FeedingEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  FeedingEvent.fromData(Map<String, dynamic> data)
+  FeedingEvent.fromData(Map<String, dynamic> data, String id)
       : type = getFeedingType(data['feedType']),
         left = data['left'] ?? true,
         leftTime = data['leftTime'] ?? 10,
@@ -91,6 +89,7 @@ class FeedingEvent extends StoryEvent {
         super(
           eventType: EventType.feeding,
           eventTime: (data['time'] as Timestamp).toDate(),
+          id: id,
         );
 
   FeedingEvent.withTime({

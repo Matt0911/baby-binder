@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'story_events.dart';
-import 'add_event_dialog.dart';
+import 'event_dialog.dart';
 
 class DiaperEvent extends StoryEvent {
   bool wet = false;
@@ -9,12 +9,12 @@ class DiaperEvent extends StoryEvent {
   bool cream = false;
   bool diarrhea = false;
   String note = '';
-  late Widget Function(BuildContext context)? buildAddDialog =
-      (context) => AddEventDialog(
-          event: this,
+  late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
+      (context, {isEdit = false}) => EventDialog(
           title: EventType.diaper.description,
+          isEdit: isEdit,
+          event: this,
           content: (
-            Map eventData,
             Function(Function()) updateEventData,
           ) =>
               Column(
@@ -82,7 +82,7 @@ class DiaperEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  DiaperEvent.fromData(Map<String, dynamic> data)
+  DiaperEvent.fromData(Map<String, dynamic> data, String id)
       : wet = data['wet'],
         bm = data['bm'],
         cream = data['cream'],
@@ -91,6 +91,7 @@ class DiaperEvent extends StoryEvent {
         super(
           eventType: EventType.diaper,
           eventTime: (data['time'] as Timestamp).toDate(),
+          id: id,
         );
 
   DiaperEvent.withTime({

@@ -1,3 +1,4 @@
+import 'package:baby_binder/events/event_dialog.dart';
 import 'package:baby_binder/events/story_events.dart';
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -21,8 +22,13 @@ class StoryData extends ChangeNotifier {
               (docChange) {
                 if (docChange.type == DocumentChangeType.added) {
                   events.insert(
-                      0, createEventFromData(docChange.doc.data() ?? {}));
+                      0,
+                      createEventFromData(
+                        docChange.doc.data() ?? {},
+                        docChange.doc.id,
+                      ));
                 } else if (docChange.type == DocumentChangeType.removed) {
+                  // TODO: event edited
                   events.removeWhere((c) => c.id == docChange.doc.id);
                 }
                 notifyListeners();
@@ -50,8 +56,8 @@ class StoryData extends ChangeNotifier {
 
   void addNewEvent(EventType eventType, BuildContext context) async {
     StoryEvent event = createEventFromType(eventType);
-    if (event.buildAddDialog != null) {
-      List results = await showModalBottomSheet(
+    if (event.buildDialog != null) {
+      bool didSave = await showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
         enableDrag: false,
@@ -63,12 +69,11 @@ class StoryData extends ChangeNotifier {
             child: Container(
               width: MediaQuery.of(context).size.width,
               height: 400,
-              child: event.buildAddDialog!(context),
+              child: event.buildDialog!(context),
             ),
           ),
         ),
       );
-      bool didSave = results[0];
       if (didSave) {
         _addEvent(event);
       } else {
@@ -76,6 +81,47 @@ class StoryData extends ChangeNotifier {
       }
     } else {
       _addEvent(event);
+    }
+  }
+
+  void _editEvent(StoryEvent event) {
+    if (_document != null) {
+      _document!
+          .collection('events')
+          .doc(event.id)
+          .update(event.convertToMap());
+    }
+  }
+
+  void editEvent(StoryEvent event, BuildContext context) async {
+    bool didSave = await showModalBottomSheet(
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      context: context,
+      builder: (BuildContext context) => SingleChildScrollView(
+        child: Padding(
+          padding: EdgeInsets.all(10)
+              .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            width: MediaQuery.of(context).size.width,
+            height: 400,
+            child: event.buildDialog != null
+                ? event.buildDialog!(context, isEdit: true)
+                : EventDialog(
+                    title: event.eventType.description,
+                    content: (Function(Function()) blank) => SizedBox(),
+                    isEdit: true,
+                    event: event,
+                  ),
+          ),
+        ),
+      ),
+    );
+    if (didSave) {
+      _editEvent(event);
+    } else {
+      print('user cancelled');
     }
   }
 }
