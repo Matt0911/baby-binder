@@ -11,7 +11,8 @@ class DiaperEvent extends StoryEvent {
   String note = '';
   late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
       (context, {isEdit = false}) => EventDialog(
-          title: EventType.diaper.description,
+          // TODO: fix styling
+          title: EventType.diaper.title,
           isEdit: isEdit,
           event: this,
           content: (
@@ -110,4 +111,11 @@ class DiaperEvent extends StoryEvent {
         'diarrhea': diarrhea,
         'note': note,
       };
+
+  @override
+  String getTimelineDescription() {
+    String diaperDesc =
+        '${wet ? '#1' : ''}${wet && bm ? ' & ' : ''}${bm ? '#2' : ''}';
+    return '$diaperDesc${cream ? ', Cream' : ''}${diarrhea ? ', Diarrhea' : ''}${note != '' ? ', $note' : ''}';
+  }
 }

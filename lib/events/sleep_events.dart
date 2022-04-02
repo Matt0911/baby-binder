@@ -22,6 +22,11 @@ class StartSleepEvent extends StoryEvent {
           eventType: EventType.started_sleeping,
           eventTime: eventTime,
         );
+
+  @override
+  String getTimelineDescription() {
+    return 'Started sleeping';
+  }
 }
 
 class EndSleepEvent extends StoryEvent {
@@ -44,4 +49,9 @@ class EndSleepEvent extends StoryEvent {
           eventType: EventType.ended_sleeping,
           eventTime: eventTime,
         );
+
+  @override
+  String getTimelineDescription() {
+    return 'Woke up';
+  }
 }

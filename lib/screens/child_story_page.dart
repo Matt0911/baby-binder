@@ -84,12 +84,14 @@ class ChildStory extends ConsumerWidget {
                     alignment: AlignmentDirectional.topStart,
                     child: Container(
                       padding: const EdgeInsets.only(left: 10),
-                      constraints: BoxConstraints(minHeight: 40, maxHeight: 40),
+                      constraints: BoxConstraints(minHeight: 50, maxHeight: 50),
                       child: Center(
                         widthFactor: 1,
                         child: Text(
-                          events[index].eventType.description,
+                          events[index].getTimelineDescription(),
                           style: TextStyle(fontSize: 14),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),
@@ -98,7 +100,7 @@ class ChildStory extends ConsumerWidget {
                     alignment: AlignmentDirectional.topEnd,
                     child: Container(
                       padding: const EdgeInsets.only(right: 10),
-                      constraints: BoxConstraints(minHeight: 40, maxHeight: 40),
+                      constraints: BoxConstraints(minHeight: 50, maxHeight: 50),
                       child: Center(
                         widthFactor: 1,
                         child: Text(
@@ -124,7 +126,7 @@ class ChildStory extends ConsumerWidget {
                     );
                   },
                   itemExtentBuilder: (context, index) {
-                    const double base = 55;
+                    const double base = 60;
                     if (index == events.length - 1) return base;
 
                     DateTime curTime = events[index].getLocalTime();
@@ -141,8 +143,12 @@ class ChildStory extends ConsumerWidget {
                           story.editEvent(events[index], context),
                       child: DotIndicator(
                         color: type.iconColor,
-                        size: 40,
-                        child: Icon(type.icon, color: type.backgroundColor),
+                        size: 50,
+                        child: Icon(
+                          type.icon,
+                          color: type.backgroundColor,
+                          size: 30,
+                        ),
                       ),
                     );
                   },

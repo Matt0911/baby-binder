@@ -3,6 +3,12 @@ import 'package:baby_binder/widgets/date_picker_row.dart';
 import 'package:baby_binder/widgets/time_picker_row.dart';
 import 'package:flutter/material.dart';
 
+enum EventDialogResult {
+  Cancel,
+  Save,
+  Delete,
+}
+
 class EventDialog extends StatefulWidget {
   const EventDialog({
     Key? key,
@@ -59,17 +65,35 @@ class _EventDialogState extends State<EventDialog> {
           ),
         ),
         SizedBox(height: 20),
-        widget.content(_updateEventData),
-        ...dateControls,
+        Expanded(
+          child: Column(
+            children: [
+              widget.content(_updateEventData),
+              ...dateControls,
+            ],
+          ),
+        ),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             TextButton(
-              onPressed: () => Navigator.pop(context, false),
+              onPressed: () => Navigator.pop(context, EventDialogResult.Cancel),
               child: const Text('Cancel'),
             ),
+            ...(widget.isEdit
+                ? [
+                    TextButton(
+                      onPressed: () =>
+                          Navigator.pop(context, EventDialogResult.Delete),
+                      child: const Text(
+                        'Delete',
+                        style: TextStyle(color: Colors.red),
+                      ),
+                    ),
+                  ]
+                : []),
             TextButton(
-              onPressed: () => Navigator.pop(context, true),
+              onPressed: () => Navigator.pop(context, EventDialogResult.Save),
               child: Text(widget.isEdit ? 'Save' : 'Add'),
             ),
           ],

@@ -59,7 +59,7 @@ class FeedingEvent extends StoryEvent {
 
   late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
       (context, {isEdit = false}) => EventDialog(
-            title: EventType.feeding.description,
+            title: EventType.feeding.title,
             isEdit: isEdit,
             event: this,
             content: (Function(Function()) updateEventData) =>
@@ -129,10 +129,23 @@ class FeedingEvent extends StoryEvent {
       ...others,
     };
   }
+
+  @override
+  String getTimelineDescription() {
+    if (type == FeedingType.nursing) {
+      return 'Left: ${leftTime}min, Right: ${rightTime}min';
+    } else if (type == FeedingType.bottle) {
+      return '$volume${isOunces ? 'oz' : 'mL'}';
+    } else if (type == FeedingType.solids) {
+      return solidFoods.join(', ');
+    }
+    return 'Feeding';
+  }
 }
 
 class FeedingDialogContent extends StatefulWidget {
   const FeedingDialogContent({
+    // TODO: fix styling now that content is in expanded
     Key? key,
     required this.event,
     required this.updateEventData,

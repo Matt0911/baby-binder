@@ -33,12 +33,12 @@ extension Event on EventType {
     }
   }
 
-  String get description {
+  String get title {
     switch (this) {
       case EventType.diaper:
         return 'Diaper';
       case EventType.started_sleeping:
-        return 'Started sleeping';
+        return 'Start Sleep';
       case EventType.ended_sleeping:
         return 'Woke up';
       case EventType.feeding:
@@ -115,6 +115,8 @@ abstract class StoryEvent {
       eventTime = date;
     }
   }
+
+  String getTimelineDescription();
 
   Map<String, dynamic> convertToMap() => {
         'type': eventType.type,

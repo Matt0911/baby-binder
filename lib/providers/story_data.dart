@@ -57,7 +57,7 @@ class StoryData extends ChangeNotifier {
   void addNewEvent(EventType eventType, BuildContext context) async {
     StoryEvent event = createEventFromType(eventType);
     if (event.buildDialog != null) {
-      bool didSave = await showModalBottomSheet(
+      EventDialogResult? result = await showModalBottomSheet(
         isScrollControlled: true,
         isDismissible: false,
         enableDrag: false,
@@ -74,10 +74,8 @@ class StoryData extends ChangeNotifier {
           ),
         ),
       );
-      if (didSave) {
+      if (result == EventDialogResult.Save) {
         _addEvent(event);
-      } else {
-        print('user cancelled');
       }
     } else {
       _addEvent(event);
@@ -93,8 +91,15 @@ class StoryData extends ChangeNotifier {
     }
   }
 
+  void _deleteEvent(StoryEvent event) {
+    if (_document != null) {
+      _document!.collection('events').doc(event.id).delete();
+    }
+  }
+
   void editEvent(StoryEvent event, BuildContext context) async {
-    bool didSave = await showModalBottomSheet(
+    bool eventHasCustomDialog = event.buildDialog != null;
+    EventDialogResult? result = await showModalBottomSheet(
       isScrollControlled: true,
       isDismissible: false,
       enableDrag: false,
@@ -105,11 +110,11 @@ class StoryData extends ChangeNotifier {
               .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
           child: Container(
             width: MediaQuery.of(context).size.width,
-            height: 400,
-            child: event.buildDialog != null
+            height: eventHasCustomDialog ? 400 : 200,
+            child: eventHasCustomDialog
                 ? event.buildDialog!(context, isEdit: true)
                 : EventDialog(
-                    title: event.eventType.description,
+                    title: event.eventType.title,
                     content: (Function(Function()) blank) => SizedBox(),
                     isEdit: true,
                     event: event,
@@ -118,10 +123,10 @@ class StoryData extends ChangeNotifier {
         ),
       ),
     );
-    if (didSave) {
+    if (result == EventDialogResult.Save) {
       _editEvent(event);
-    } else {
-      print('user cancelled');
+    } else if (result == EventDialogResult.Delete) {
+      _deleteEvent(event);
     }
   }
 }
