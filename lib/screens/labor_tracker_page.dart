@@ -119,8 +119,11 @@ class DataRow extends StatelessWidget {
 }
 
 class ContractionRow extends StatelessWidget {
-  const ContractionRow({Key? key, required this.contraction}) : super(key: key);
+  const ContractionRow(
+      {Key? key, required this.contraction, this.prevContraction})
+      : super(key: key);
   final Contraction contraction;
+  final Contraction? prevContraction;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +132,10 @@ class ContractionRow extends StatelessWidget {
       contraction.duration != null
           ? convertSecsToString(contraction.duration!.inSeconds)
           : null,
+      prevContraction == null
+          ? '--'
+          : convertSecsToString(
+              contraction.start.difference(prevContraction!.start).inSeconds),
     ]);
   }
 }
@@ -138,7 +145,7 @@ class TitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DataRow(items: ['Time', 'Duration'], isBold: true);
+    return DataRow(items: ['Time', 'Duration', 'Interval'], isBold: true);
   }
 }
 
@@ -229,6 +236,9 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
               itemCount: laborData.contractions.length,
               itemBuilder: (context, i) => ContractionRow(
                 contraction: laborData.contractions[i],
+                prevContraction: i + 1 < laborData.contractions.length
+                    ? laborData.contractions[i + 1]
+                    : null,
               ),
             ),
           ),
