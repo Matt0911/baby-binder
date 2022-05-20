@@ -26,7 +26,7 @@ class ChildSettingsPage extends ConsumerWidget {
                   Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: ChildAvatar(
-                      childImage: activeChild!.image,
+                      childImage: activeChild.image,
                       childName: activeChild.name,
                       updateName: activeChild.updateName,
                     ),
