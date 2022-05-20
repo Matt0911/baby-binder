@@ -1,5 +1,5 @@
 import 'package:baby_binder/constants.dart';
-import 'package:baby_binder/providers/auth_state.dart';
+import 'package:baby_binder/providers/app_state.dart';
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
@@ -18,7 +18,7 @@ class BabyBinderDrawer extends ConsumerWidget {
   Widget build(context, ref) {
     String currentRoute = ModalRoute.of(context)!.settings.name ?? 'test';
     final activeChild = ref.watch(activeChildProvider);
-    final authState = ref.watch(authStateProvider);
+    final appState = ref.watch(appStateProvider);
     return Drawer(
       child: ListView(
         children: [
@@ -35,7 +35,7 @@ class BabyBinderDrawer extends ConsumerWidget {
                       ]
                     : []),
                 TextButton.icon(
-                  onPressed: () => Navigator.pushNamed(
+                  onPressed: () => appState.navigateToPage(
                       context, ChildSelectionPage.routeName),
                   icon: Icon(
                     Icons.switch_account_outlined,
@@ -59,7 +59,8 @@ class BabyBinderDrawer extends ConsumerWidget {
             selected: ChildStoryPage.routeName == currentRoute,
             onTap: ChildStoryPage.routeName == currentRoute
                 ? () => Navigator.pop(context)
-                : () => Navigator.pushNamed(context, ChildStoryPage.routeName),
+                : () =>
+                    appState.navigateToPage(context, ChildStoryPage.routeName),
           ),
           ListTile(
             leading: Icon(Icons.settings),
@@ -67,14 +68,14 @@ class BabyBinderDrawer extends ConsumerWidget {
             selected: ChildSettingsPage.routeName == currentRoute,
             onTap: ChildSettingsPage.routeName == currentRoute
                 ? () => Navigator.pop(context)
-                : () =>
-                    Navigator.pushNamed(context, ChildSettingsPage.routeName),
+                : () => appState.navigateToPage(
+                    context, ChildSettingsPage.routeName),
           ),
           ListTile(
             leading: Icon(Icons.logout),
             title: Text('Logout'),
             selected: false,
-            onTap: () => authState.signOut(context),
+            onTap: () => appState.signOut(context),
           ),
         ],
       ),

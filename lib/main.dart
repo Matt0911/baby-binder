@@ -1,7 +1,5 @@
 import 'package:baby_binder/firebase_options.dart';
-import 'package:baby_binder/providers/auth_state.dart';
-import 'package:baby_binder/providers/auth.dart';
-import 'package:baby_binder/providers/children_data.dart';
+import 'package:baby_binder/providers/app_state.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
@@ -12,21 +10,30 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await Hive.initFlutter();
+  var generalBox = await Hive.openBox('general');
   runApp(
-    ProviderScope(child: BabyBinder()),
+    ProviderScope(
+        child: BabyBinder(
+      box: generalBox,
+    )),
   );
 }
 
 class BabyBinder extends ConsumerWidget {
+  const BabyBinder({required this.box});
+  final Box box;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final appState = ref.watch(authStateProvider);
+    final appState = ref.watch(appStateProvider);
     appState.context = context;
+    final lastPage = box.get('lastPage');
     return MaterialApp(
       title: 'Baby Binder',
       theme: ThemeData(
@@ -35,8 +42,14 @@ class BabyBinder extends ConsumerWidget {
         ),
         toggleableActiveColor: Colors.teal,
       ),
-      home: LandingFlow(),
+      initialRoute: FirebaseAuth.instance.currentUser == null
+          ? '/landing'
+          : lastPage ?? ChildSelectionPage.routeName,
       routes: {
+        '/landing': (context) {
+          _updateAuthCallbacks(context, appState);
+          return LandingFlow();
+        },
         LoginScreen.routeName: (context) {
           _updateAuthCallbacks(context, appState);
           return LoginScreen();
@@ -61,7 +74,7 @@ class BabyBinder extends ConsumerWidget {
     );
   }
 
-  _updateAuthCallbacks(BuildContext context, AuthState appState) {
+  _updateAuthCallbacks(BuildContext context, AppState appState) {
     appState.context = context;
   }
 }

@@ -1,3 +1,4 @@
+import 'package:baby_binder/providers/hive_provider.dart';
 import 'package:baby_binder/screens/child_selection_page.dart';
 import 'package:baby_binder/screens/login_screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,13 +9,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'auth.dart';
 
-final authStateProvider = ChangeNotifierProvider((ref) => AuthState());
+final appStateProvider = ChangeNotifierProvider((ref) {
+  final hiveBox = ref.watch(hiveProvider).asData?.value;
+  return AppState(hiveBox);
+});
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-class AuthState extends ChangeNotifier {
-  AuthState() {
+class AppState extends ChangeNotifier {
+  AppState(this.hive) {
     init();
   }
+  HiveDB? hive;
 
   BuildContext? context;
   Future<void> init() async {
@@ -34,6 +39,11 @@ class AuthState extends ChangeNotifier {
 
   String? _email;
   String? get email => _email;
+
+  void navigateToPage(BuildContext context, String route) {
+    hive?.updateLastPage(route);
+    Navigator.of(context).pushNamed(route);
+  }
 
   void startLoginFlow() {
     _loginState = ApplicationLoginState.emailAddress;
@@ -72,7 +82,7 @@ class AuthState extends ChangeNotifier {
         email: email,
         password: password,
       );
-      Navigator.of(context).pushNamed(ChildSelectionPage.routeName);
+      navigateToPage(context, ChildSelectionPage.routeName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }
@@ -100,7 +110,7 @@ class AuthState extends ChangeNotifier {
         'children': [],
         'email': email,
       });
-      Navigator.of(context).pushNamed(ChildSelectionPage.routeName);
+      navigateToPage(context, ChildSelectionPage.routeName);
     } on FirebaseAuthException catch (e) {
       errorCallback(e);
     }

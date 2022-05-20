@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:wakelock/wakelock.dart';
-import 'package:timelines/timelines.dart';
-import 'dart:math';
 
 String convertSecsToString(int valueInSecs) {
   final mins = valueInSecs ~/ 60;
@@ -212,7 +210,6 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
 
   @override
   Widget build(BuildContext context) {
-    final activeChild = ref.watch(activeChildProvider);
     final laborData = ref.watch(laborTrackerDataProvider);
     return Scaffold(
       appBar: AppBar(title: Text('Labor Tracker')),

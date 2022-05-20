@@ -1,4 +1,4 @@
-import 'package:baby_binder/providers/auth_state.dart';
+import 'package:baby_binder/providers/app_state.dart';
 import 'package:baby_binder/providers/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -10,7 +10,7 @@ class LoginScreen extends ConsumerWidget {
 
   @override
   Widget build(context, ref) {
-    final authState = ref.watch(authStateProvider);
+    final authState = ref.watch(appStateProvider);
     return Authentication(
       loginState: authState.loginState,
       email: authState.email,

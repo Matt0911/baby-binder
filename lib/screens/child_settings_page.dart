@@ -12,59 +12,61 @@ class ChildSettingsPage extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final activeChild = ref.watch(activeChildProvider);
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Baby Binder'),
-      ),
-      drawer: BabyBinderDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          children: [
-            Padding(
+    return activeChild == null
+        ? const CircularProgressIndicator()
+        : Scaffold(
+            appBar: AppBar(
+              title: const Text('Baby Binder'),
+            ),
+            drawer: BabyBinderDrawer(),
+            body: Padding(
               padding: const EdgeInsets.all(8.0),
-              child: ChildAvatar(
-                childImage: activeChild!.image,
-                childName: activeChild.name,
-                updateName: activeChild.updateName,
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: ChildAvatar(
+                      childImage: activeChild!.image,
+                      childName: activeChild.name,
+                      updateName: activeChild.updateName,
+                    ),
+                  ),
+                  Expanded(
+                      flex: 1,
+                      child: Column(
+                        children: [
+                          DatePickerRow(
+                            settingName: 'Birth Date',
+                            settingValue: activeChild.birthdate,
+                            updateValue: activeChild.updateBirthDate,
+                          ),
+                          activeChild.birthdate != null &&
+                                  DateTime(
+                                        activeChild.birthdate!.year,
+                                        activeChild.birthdate!.month,
+                                        activeChild.birthdate!.day,
+                                      ).compareTo(DateTime.now()) <=
+                                      0
+                              ? TimePickerRow(
+                                  settingName: 'Birth Time',
+                                  settingValue: activeChild.birthdate!,
+                                  updateValue: activeChild.updateBirthDate,
+                                )
+                              : SizedBox(),
+                        ],
+                      )),
+                  // OutlinedButton(
+                  //   child: Text(
+                  //     'View Story',
+                  //     style: TextStyle(fontSize: 20),
+                  //   ),
+                  //   onPressed: () =>
+                  //       Navigator.pushNamed(context, ChildStoryPage.routeName),
+                  // ),
+                ],
               ),
             ),
-            Expanded(
-                flex: 1,
-                child: Column(
-                  children: [
-                    DatePickerRow(
-                      settingName: 'Birth Date',
-                      settingValue: activeChild.birthdate,
-                      updateValue: activeChild.updateBirthDate,
-                    ),
-                    activeChild.birthdate != null &&
-                            DateTime(
-                                  activeChild.birthdate!.year,
-                                  activeChild.birthdate!.month,
-                                  activeChild.birthdate!.day,
-                                ).compareTo(DateTime.now()) <=
-                                0
-                        ? TimePickerRow(
-                            settingName: 'Birth Time',
-                            settingValue: activeChild.birthdate!,
-                            updateValue: activeChild.updateBirthDate,
-                          )
-                        : SizedBox(),
-                  ],
-                )),
-            // OutlinedButton(
-            //   child: Text(
-            //     'View Story',
-            //     style: TextStyle(fontSize: 20),
-            //   ),
-            //   onPressed: () =>
-            //       Navigator.pushNamed(context, ChildStoryPage.routeName),
-            // ),
-          ],
-        ),
-      ),
-    );
+          );
   }
 }
 

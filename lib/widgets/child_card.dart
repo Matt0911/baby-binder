@@ -1,3 +1,4 @@
+import 'package:baby_binder/providers/app_state.dart';
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/screens/child_settings_page.dart';
 import 'package:baby_binder/screens/child_story_page.dart';
@@ -12,6 +13,7 @@ class ChildCard extends ConsumerWidget {
   @override
   Widget build(context, ref) {
     final setActiveChild = ref.watch(childrenDataProvider).setActiveChild;
+    final appState = ref.watch(appStateProvider);
     return Card(
       child: Padding(
         padding: const EdgeInsets.all(8.0),
@@ -27,14 +29,14 @@ class ChildCard extends ConsumerWidget {
             ElevatedButton(
               onPressed: () {
                 setActiveChild(id: childData.id);
-                Navigator.pushNamed(context, ChildStoryPage.routeName);
+                appState.navigateToPage(context, ChildStoryPage.routeName);
               },
               child: Text('View Story'),
             ),
             OutlinedButton(
               onPressed: () {
                 setActiveChild(id: childData.id);
-                Navigator.pushNamed(context, ChildSettingsPage.routeName);
+                appState.navigateToPage(context, ChildSettingsPage.routeName);
               },
               child: Text('Settings'),
             )
