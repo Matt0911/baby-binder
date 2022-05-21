@@ -5,8 +5,8 @@ import 'package:baby_binder/providers/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
+import 'package:hive/hive.dart';
 
 final FirebaseFirestore firestore = FirebaseFirestore.instance;
 final firebase_storage.FirebaseStorage storage =
@@ -24,10 +24,10 @@ class ChildrenData extends ChangeNotifier {
   UserData userData;
 
   _init() async {
-    prefs = await SharedPreferences.getInstance();
+    prefs = await Hive.openBox('childrenData');
 
     if (userData.isLoaded && userData.children.length > 0) {
-      final initialSavedChildId = prefs.getString('activeChild');
+      final initialSavedChildId = prefs.get('activeChild');
       _childrenListSubscription = firestore
           .collection('children')
           .where(FieldPath.documentId, whereIn: userData.children)
@@ -66,12 +66,12 @@ class ChildrenData extends ChangeNotifier {
   setActiveChild({required String id}) async {
     if (activeChildId == null || id != activeChildId) {
       activeChildId = id;
-      prefs.setString('activeChild', id);
+      prefs.put('activeChild', id);
       notifyListeners();
     }
   }
 
-  late SharedPreferences prefs;
+  late Box prefs;
   StreamSubscription<QuerySnapshot>? _childrenListSubscription;
   List<String> children = [];
   Map<String, Map<String, dynamic>?> _childrenDataMaps = {};

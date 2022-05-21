@@ -1,4 +1,5 @@
 import 'package:baby_binder/events/event_dialog.dart';
+import 'package:baby_binder/events/sleep_events.dart';
 import 'package:baby_binder/events/story_events.dart';
 import 'package:baby_binder/providers/children_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,9 +41,12 @@ class StoryData extends ChangeNotifier {
   List<StoryEvent> events = [];
   bool get isSleeping =>
       events
-          .firstWhere((e) =>
-              e.eventType == EventType.started_sleeping ||
-              e.eventType == EventType.ended_sleeping)
+          .firstWhere(
+            (e) =>
+                e.eventType == EventType.started_sleeping ||
+                e.eventType == EventType.ended_sleeping,
+            orElse: () => EndSleepEvent(),
+          )
           .eventType ==
       EventType.started_sleeping;
   DocumentReference<Map<String, dynamic>>? _document;
