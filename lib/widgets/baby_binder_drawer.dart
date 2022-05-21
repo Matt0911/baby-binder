@@ -37,16 +37,16 @@ class BabyBinderDrawer extends ConsumerWidget {
                 TextButton.icon(
                   onPressed: () => appState.navigateToPage(
                       context, ChildSelectionPage.routeName),
-                  icon: Icon(
+                  icon: const Icon(
                     Icons.switch_account_outlined,
                     size: 16,
                     color: kGreyTextColor,
                   ),
-                  label: Text(
+                  label: const Text(
                     'Change',
                     style: TextStyle(fontSize: 12, color: kGreyTextColor),
                   ),
-                  style: ButtonStyle(
+                  style: const ButtonStyle(
                     visualDensity: VisualDensity.compact,
                   ),
                 )
@@ -54,8 +54,8 @@ class BabyBinderDrawer extends ConsumerWidget {
             ),
           ),
           ListTile(
-            leading: Icon(Icons.book),
-            title: Text('Story'),
+            leading: const Icon(Icons.book),
+            title: const Text('Story'),
             selected: ChildStoryPage.routeName == currentRoute,
             onTap: ChildStoryPage.routeName == currentRoute
                 ? () => Navigator.pop(context)
@@ -63,8 +63,8 @@ class BabyBinderDrawer extends ConsumerWidget {
                     appState.navigateToPage(context, ChildStoryPage.routeName),
           ),
           ListTile(
-            leading: Icon(Icons.settings),
-            title: Text('Child Settings'),
+            leading: const Icon(Icons.settings),
+            title: const Text('Child Settings'),
             selected: ChildSettingsPage.routeName == currentRoute,
             onTap: ChildSettingsPage.routeName == currentRoute
                 ? () => Navigator.pop(context)
@@ -72,8 +72,8 @@ class BabyBinderDrawer extends ConsumerWidget {
                     context, ChildSettingsPage.routeName),
           ),
           ListTile(
-            leading: Icon(Icons.logout),
-            title: Text('Logout'),
+            leading: const Icon(Icons.logout),
+            title: const Text('Logout'),
             selected: false,
             onTap: () => appState.signOut(context),
           ),

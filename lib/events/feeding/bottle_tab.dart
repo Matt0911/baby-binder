@@ -25,7 +25,7 @@ class BottleTab extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('${event.volume}', style: kLargeNumberTextStyle),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             ToggleButtons(
               isSelected: [event.isOunces, !event.isOunces],
               borderRadius: BorderRadius.circular(10),
@@ -48,7 +48,7 @@ class BottleTab extends StatelessWidget {
                   });
                 }
               },
-              children: [Text('oz'), Text('mL')],
+              children: const [Text('oz'), Text('mL')],
             ),
           ],
         ),

@@ -15,14 +15,14 @@ class HiveDB {
   }
 
   _init() async {
-    this._generalBox = await Hive.openBox('general');
+    _generalBox = await Hive.openBox('general');
   }
 
   void updateLastPage(String page) {
-    this._generalBox.put('lastPage', page);
+    _generalBox.put('lastPage', page);
   }
 
   String getLastPage() {
-    return this._generalBox.get('lastPage') ?? '';
+    return _generalBox.get('lastPage') ?? '';
   }
 }

@@ -127,7 +127,7 @@ abstract class StoryEvent {
 DateTime castDate(dynamic x) {
   try {
     return (x as DateTime);
-  } on TypeError catch (e) {
+  } on TypeError {
     print('TypeError when trying to cast $x as DateTime, trying Timestamp');
     return (x as Timestamp).toDate();
   }
@@ -168,4 +168,4 @@ StoryEvent createEventFromType(EventType type) {
 }
 
 final Widget Function(Function? onSave) emptyBuilder =
-    (onSave) => SizedBox.shrink();
+    (onSave) => const SizedBox.shrink();

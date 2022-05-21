@@ -16,15 +16,13 @@ class LaborTrackerData extends ChangeNotifier {
     if (_document != null) {
       _document!.collection('labor').orderBy('time').snapshots().listen(
         (snapshot) {
-          snapshot.docChanges.forEach(
-            (docChange) {
+          for (var docChange in snapshot.docChanges) {
               if (docChange.type == DocumentChangeType.added) {
                 _addContraction(docChange.doc.id, docChange.doc.data() ?? {});
               } else if (docChange.type == DocumentChangeType.removed) {
                 _removeContraction(docChange.doc.id);
               }
-            },
-          );
+            }
           notifyListeners();
         },
       );
@@ -32,7 +30,7 @@ class LaborTrackerData extends ChangeNotifier {
   }
 
   List<Contraction> contractions = [];
-  DocumentReference<Map<String, dynamic>>? _document;
+  final DocumentReference<Map<String, dynamic>>? _document;
 
   void _removeContraction(String id) {
     contractions.removeWhere((c) => c.id == id);
@@ -56,12 +54,12 @@ class LaborTrackerData extends ChangeNotifier {
 
 class Contraction {
   Contraction({DateTime? start}) {
-    this._start = start ?? DateTime.now();
+    _start = start ?? DateTime.now();
   }
 
   Contraction.fromData(String id, Map<String, dynamic> data)
       : _start = (data['time'] as Timestamp).toDate(),
-        this.id = id,
+        id = id,
         duration = Duration(seconds: data['durationSeconds']);
 
   String? id;
@@ -79,7 +77,7 @@ final oneHourLaborDataProvider = Provider((ref) {
   final contractions = ref.watch(laborTrackerDataProvider).contractions;
   List<Contraction> oneHourContractions = contractions
       .where(
-          (c) => c.start.isAfter(DateTime.now().subtract(Duration(hours: 1))))
+          (c) => c.start.isAfter(DateTime.now().subtract(const Duration(hours: 1))))
       .toList();
   int durationTot = 0, intervalTot = 0, restTot = 0;
   int len = oneHourContractions.length;

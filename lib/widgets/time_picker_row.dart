@@ -41,7 +41,7 @@ class TimePickerRow extends StatelessWidget {
             );
             print('selected $selected');
             if (selected == null) return;
-            updateValue(new DateTime(settingValue.year, settingValue.month,
+            updateValue(DateTime(settingValue.year, settingValue.month,
                 settingValue.day, selected.hour, selected.minute));
           },
           child: Text(

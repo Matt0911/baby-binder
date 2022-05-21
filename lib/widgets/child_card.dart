@@ -31,14 +31,14 @@ class ChildCard extends ConsumerWidget {
                 setActiveChild(id: childData.id);
                 appState.navigateToPage(context, ChildStoryPage.routeName);
               },
-              child: Text('View Story'),
+              child: const Text('View Story'),
             ),
             OutlinedButton(
               onPressed: () {
                 setActiveChild(id: childData.id);
                 appState.navigateToPage(context, ChildSettingsPage.routeName);
               },
-              child: Text('Settings'),
+              child: const Text('Settings'),
             )
           ],
         ),

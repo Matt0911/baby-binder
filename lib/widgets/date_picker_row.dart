@@ -40,7 +40,7 @@ class DatePickerRow extends StatelessWidget {
               context: context,
               initialDate: now,
               firstDate: DateTime.utc(2000),
-              lastDate: now.add(Duration(days: 280)),
+              lastDate: now.add(const Duration(days: 280)),
             );
             if (selected == null) return;
             updateValue(selected);

@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChildSettingsPage extends ConsumerWidget {
-  static final String routeName = '/child-settings-page';
+  static const String routeName = '/child-settings-page';
 
   @override
   Widget build(context, ref) {
@@ -18,7 +18,7 @@ class ChildSettingsPage extends ConsumerWidget {
             appBar: AppBar(
               title: const Text('Baby Binder'),
             ),
-            drawer: BabyBinderDrawer(),
+            drawer: const BabyBinderDrawer(),
             body: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -52,7 +52,7 @@ class ChildSettingsPage extends ConsumerWidget {
                                   settingValue: activeChild.birthdate!,
                                   updateValue: activeChild.updateBirthDate,
                                 )
-                              : SizedBox(),
+                              : const SizedBox(),
                         ],
                       )),
                   // OutlinedButton(
@@ -85,7 +85,7 @@ class SettingRow extends StatelessWidget {
   @override
   Widget build(context) {
     return Container(
-        padding: EdgeInsets.all(8),
+        padding: const EdgeInsets.all(8),
         child: Row(
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

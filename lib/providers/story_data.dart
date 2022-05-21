@@ -34,7 +34,7 @@ class StoryData extends ChangeNotifier {
           )
           .eventType ==
       EventType.started_sleeping;
-  DocumentReference<Map<String, dynamic>>? _document;
+  final DocumentReference<Map<String, dynamic>>? _document;
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? listener;
 
   void _initListener() {
@@ -96,9 +96,9 @@ class StoryData extends ChangeNotifier {
         context: context,
         builder: (BuildContext context) => SingleChildScrollView(
           child: Padding(
-            padding: EdgeInsets.all(10)
+            padding: const EdgeInsets.all(10)
                 .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
-            child: Container(
+            child: SizedBox(
               width: MediaQuery.of(context).size.width,
               height: 400,
               child: event.buildDialog!(context),
@@ -139,16 +139,16 @@ class StoryData extends ChangeNotifier {
       context: context,
       builder: (BuildContext context) => SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(10)
+          padding: const EdgeInsets.all(10)
               .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             height: eventHasCustomDialog ? 400 : 200,
             child: eventHasCustomDialog
                 ? clone.buildDialog!(context, isEdit: true)
                 : EventDialog(
                     title: clone.eventType.title,
-                    content: (Function(Function()) blank) => SizedBox(),
+                    content: (Function(Function()) blank) => const SizedBox(),
                     isEdit: true,
                     event: clone,
                   ),

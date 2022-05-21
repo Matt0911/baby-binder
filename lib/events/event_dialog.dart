@@ -58,13 +58,13 @@ class _EventDialogState extends State<EventDialog> {
       children: [
         Text(
           widget.title,
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.teal,
             fontWeight: FontWeight.bold,
             fontSize: 25,
           ),
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Expanded(
           child: Column(
             children: [

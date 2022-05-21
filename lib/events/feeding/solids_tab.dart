@@ -23,7 +23,7 @@ const mockResults = <String>[
 ];
 
 class SolidTab extends StatefulWidget {
-  SolidTab({
+  const SolidTab({
     Key? key,
     required this.event,
     required this.updateEventData,
@@ -46,12 +46,12 @@ class _SolidTabState extends State<SolidTab> {
       children: [
         ChipsInput(
           key: _chipKey,
-          decoration: InputDecoration(
+          decoration: const InputDecoration(
             labelText: "Select Foods",
           ),
           maxChips: 3,
           findSuggestions: (String query) {
-            if (query.length != 0) {
+            if (query.isNotEmpty) {
               var lowercaseQuery = query.toLowerCase();
               return mockResults.where((food) {
                 return food.toLowerCase().contains(query.toLowerCase());

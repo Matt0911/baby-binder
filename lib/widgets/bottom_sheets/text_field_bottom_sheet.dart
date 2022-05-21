@@ -27,7 +27,7 @@ class _TextFieldEditorState extends State<TextFieldEditor> {
   @override
   void initState() {
     super.initState();
-    _controller = new TextEditingController(text: widget.initialValue);
+    _controller = TextEditingController(text: widget.initialValue);
   }
 
   @override
@@ -37,7 +37,7 @@ class _TextFieldEditorState extends State<TextFieldEditor> {
         Row(
           children: [
             Text('${widget.name}:'),
-            SizedBox(width: 10),
+            const SizedBox(width: 10),
             Expanded(
               child: TextField(
                 controller: _controller,
@@ -50,7 +50,7 @@ class _TextFieldEditorState extends State<TextFieldEditor> {
             ),
           ],
         ),
-        Expanded(child: SizedBox()),
+        const Expanded(child: SizedBox()),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -85,9 +85,9 @@ final showTextFieldBottomSheet = (
       context: context,
       builder: (BuildContext context) => SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.all(10)
+          padding: const EdgeInsets.all(10)
               .copyWith(bottom: MediaQuery.of(context).viewInsets.bottom),
-          child: Container(
+          child: SizedBox(
             width: MediaQuery.of(context).size.width,
             height: 100,
             child: TextFieldEditor(

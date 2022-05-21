@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:baby_binder/constants.dart';
-import 'package:baby_binder/providers/children_data.dart';
 import 'package:baby_binder/providers/labor_tracker.dart';
 import 'package:baby_binder/widgets/baby_binder_drawer.dart';
 import 'package:flutter/material.dart';
@@ -24,24 +23,24 @@ class OneHourAveragesDisplay extends ConsumerWidget {
     return Column(
       mainAxisSize: MainAxisSize.max,
       children: [
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Text('Last Hour Averages',
             style: TextStyle(
               color: Theme.of(context).colorScheme.primary,
               fontSize: 30,
               fontWeight: FontWeight.bold,
             )),
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
         Expanded(
           child: Row(
             children: [
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
               OneHourAverage(
                   title: 'Duration', valueInSec: oneHourData.durationSeconds),
-              SizedBox(width: 20),
+              const SizedBox(width: 20),
               OneHourAverage(
                   title: 'Interval', valueInSec: oneHourData.intervalSeconds),
-              SizedBox(width: 10),
+              const SizedBox(width: 10),
             ],
           ),
         )
@@ -51,7 +50,7 @@ class OneHourAveragesDisplay extends ConsumerWidget {
 }
 
 class OneHourAverage extends StatelessWidget {
-  OneHourAverage({
+  const OneHourAverage({
     Key? key,
     required this.title,
     required this.valueInSec,
@@ -74,7 +73,7 @@ class OneHourAverage extends StatelessWidget {
             ),
             Text(
               title,
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -143,7 +142,7 @@ class TitleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return DataRow(items: ['Time', 'Duration', 'Interval'], isBold: true);
+    return const DataRow(items: ['Time', 'Duration', 'Interval'], isBold: true);
   }
 }
 
@@ -163,8 +162,8 @@ class _ContractionTimerButtonState extends State<ContractionTimerButton> {
   String _label = '0s';
 
   void startTimer() {
-    const oneSec = const Duration(seconds: 1);
-    _timer = new Timer.periodic(
+    const oneSec = Duration(seconds: 1);
+    _timer = Timer.periodic(
       oneSec,
       (Timer timer) {
         if (widget.isRunning) {
@@ -195,7 +194,7 @@ class _ContractionTimerButtonState extends State<ContractionTimerButton> {
 }
 
 class LaborTrackerPage extends ConsumerStatefulWidget {
-  static final routeName = '/labor-tracker';
+  static const routeName = '/labor-tracker';
 
   LaborTrackerPage({Key? key}) : super(key: key);
 
@@ -212,8 +211,8 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
   Widget build(BuildContext context) {
     final laborData = ref.watch(laborTrackerDataProvider);
     return Scaffold(
-      appBar: AppBar(title: Text('Labor Tracker')),
-      drawer: BabyBinderDrawer(),
+      appBar: AppBar(title: const Text('Labor Tracker')),
+      drawer: const BabyBinderDrawer(),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -222,11 +221,11 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
           //     child: Container(
           //       color: Colors.blue,
           //     )),
-          Expanded(
+          const Expanded(
             flex: 1,
             child: OneHourAveragesDisplay(),
           ),
-          TitleRow(),
+          const TitleRow(),
           Expanded(
             flex: 4,
             child: ListView.builder(
@@ -258,16 +257,16 @@ class LaborTrackerPageState extends ConsumerState<LaborTrackerPage> {
                   }
                 });
               },
+              fillColor: currentContraction == null ? Colors.green : Colors.red,
+              constraints: const BoxConstraints(minHeight: 60),
+              textStyle: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold),
               child: ContractionTimerButton(
                 stopwatch: widget.stopwatch,
                 isRunning: currentContraction != null,
               ),
-              fillColor: currentContraction == null ? Colors.green : Colors.red,
-              constraints: BoxConstraints(minHeight: 60),
-              textStyle: TextStyle(
-                  fontSize: 20,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold),
             ),
           )
         ],

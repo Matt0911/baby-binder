@@ -37,7 +37,7 @@ class BabyBinder extends ConsumerWidget {
     return MaterialApp(
       title: 'Baby Binder',
       theme: ThemeData(
-        colorScheme: ColorScheme.light().copyWith(
+        colorScheme: const ColorScheme.light().copyWith(
           primary: Colors.teal,
         ),
         toggleableActiveColor: Colors.teal,
@@ -52,11 +52,11 @@ class BabyBinder extends ConsumerWidget {
         },
         LoginScreen.routeName: (context) {
           _updateAuthCallbacks(context, appState);
-          return LoginScreen();
+          return const LoginScreen();
         },
         ChildSelectionPage.routeName: (context) {
           _updateAuthCallbacks(context, appState);
-          return ChildSelectionPage();
+          return const ChildSelectionPage();
         },
         ChildSettingsPage.routeName: (context) {
           _updateAuthCallbacks(context, appState);
@@ -64,7 +64,7 @@ class BabyBinder extends ConsumerWidget {
         },
         ChildStoryPage.routeName: (context) {
           _updateAuthCallbacks(context, appState);
-          return ChildStoryPage();
+          return const ChildStoryPage();
         },
         LaborTrackerPage.routeName: (context) {
           _updateAuthCallbacks(context, appState);
@@ -99,9 +99,9 @@ class _LandingFlowState extends State<LandingFlow> {
           }
 
           if (snapshot.hasData) {
-            return ChildSelectionPage();
+            return const ChildSelectionPage();
           } else {
-            return LoginScreen();
+            return const LoginScreen();
           }
         },
       );

@@ -18,10 +18,11 @@ class NursingSideCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      margin: const EdgeInsets.all(10),
       child: Column(children: [
         Text(
           text,
-          style: TextStyle(
+          style: const TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 25,
             color: Colors.teal,
@@ -34,7 +35,7 @@ class NursingSideCard extends StatelessWidget {
             children: [
               IconButton(
                 onPressed: () => updateValue(-1),
-                icon: Icon(Icons.remove),
+                icon: const Icon(Icons.remove),
               ),
               Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -44,18 +45,17 @@ class NursingSideCard extends StatelessWidget {
                     time.toString(),
                     style: kLargeNumberTextStyle,
                   ),
-                  Text('min'),
+                  const Text('min'),
                 ],
               ),
               IconButton(
                 onPressed: () => updateValue(1),
-                icon: Icon(Icons.add),
+                icon: const Icon(Icons.add),
               ),
             ],
           ),
         )
       ]),
-      margin: EdgeInsets.all(10),
     );
   }
 }

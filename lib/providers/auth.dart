@@ -15,14 +15,14 @@ const kInputDecoration = InputDecoration(
   filled: true,
   fillColor: Colors.white,
   border: UnderlineInputBorder(
-    borderSide: const BorderSide(color: Colors.white),
+    borderSide: BorderSide(color: Colors.white),
     borderRadius: BorderRadius.all(Radius.circular(25.7)),
   ),
   errorStyle: TextStyle(fontSize: 14, color: Colors.white),
 );
 
 final kButtonStyle = ButtonStyle(
-  backgroundColor: MaterialStateProperty.all<Color>(Color(0xFF4DB6AC)),
+  backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFF4DB6AC)),
 );
 
 class Authentication extends StatelessWidget {
@@ -103,7 +103,7 @@ class Authentication extends StatelessWidget {
         );
       case ApplicationLoginState.loggedIn:
         // Navigator.pushNamed(context, ChildSelectionPage.routeName);
-        return SizedBox();
+        return const SizedBox();
       default:
         return Row(
           children: const [
@@ -122,9 +122,9 @@ class Authentication extends StatelessWidget {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
+            const Expanded(
               child: Center(
-                child: const Text(
+                child: Text(
                   'Baby Binder',
                   style: kTitleDarkTextStyle,
                 ),
@@ -214,7 +214,7 @@ class _EmailFormState extends State<EmailForm> {
                     widget.callback(_controller.text);
                   }
                 },
-                icon: Icon(
+                icon: const Icon(
                   Icons.arrow_forward,
                   color: Colors.teal,
                 )),
@@ -336,7 +336,7 @@ class _RegisterFormState extends State<RegisterForm> {
                       hintText: 'Enter your password',
                       suffixIcon: IconButton(
                           onPressed: submit,
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.arrow_forward,
                             color: Colors.teal,
                           )),
@@ -459,7 +459,7 @@ class _PasswordFormState extends State<PasswordForm> {
                       hintText: 'Enter your password',
                       suffixIcon: IconButton(
                           onPressed: submit,
-                          icon: Icon(
+                          icon: const Icon(
                             Icons.arrow_forward,
                             color: Colors.teal,
                           )),

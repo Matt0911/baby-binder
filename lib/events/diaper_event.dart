@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'story_events.dart';
 import 'event_dialog.dart';
@@ -9,6 +8,7 @@ class DiaperEvent extends StoryEvent {
   bool cream = false;
   bool diarrhea = false;
   String note = '';
+  @override
   late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
       (context, {isEdit = false}) => EventDialog(
           // TODO: fix styling
@@ -33,12 +33,12 @@ class DiaperEvent extends StoryEvent {
                         }
                       });
                     },
-                    children: [Text('#1'), Text('#2'), Text('Both')],
+                    children: const [Text('#1'), Text('#2'), Text('Both')],
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Applied cream?'),
+                      const Text('Applied cream?'),
                       Switch(
                         value: cream,
                         onChanged: (selected) {
@@ -50,7 +50,7 @@ class DiaperEvent extends StoryEvent {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Diarrhea?'),
+                      const Text('Diarrhea?'),
                       Switch(
                         value: diarrhea,
                         onChanged: bm
@@ -63,8 +63,8 @@ class DiaperEvent extends StoryEvent {
                   ),
                   Row(
                     children: [
-                      Text('Notes'),
-                      SizedBox(width: 20),
+                      const Text('Notes'),
+                      const SizedBox(width: 20),
                       Expanded(
                         child: TextField(
                           onChanged: (note) {

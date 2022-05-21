@@ -1,6 +1,5 @@
 import 'package:baby_binder/events/event_dialog.dart';
 import 'package:baby_binder/events/story_events.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'bottle_tab.dart';
 import 'nursing_tab.dart';
@@ -57,6 +56,7 @@ class FeedingEvent extends StoryEvent {
   // solids data
   List<String> solidFoods = [];
 
+  @override
   late Widget Function(BuildContext context, {bool isEdit})? buildDialog =
       (context, {isEdit = false}) => EventDialog(
             title: EventType.feeding.title,
@@ -197,7 +197,7 @@ class _FeedingDialogContentState extends State<FeedingDialogContent>
         mainAxisSize: MainAxisSize.min,
         children: [
           TabBar(
-            tabs: [
+            tabs: const [
               Tab(text: 'Nursing'),
               Tab(text: 'Bottle'),
               Tab(text: 'Solids')
@@ -205,11 +205,12 @@ class _FeedingDialogContentState extends State<FeedingDialogContent>
             controller: _tabController,
             indicatorColor: Colors.teal.shade200,
             labelColor: Colors.teal,
-            labelStyle: TextStyle(fontWeight: FontWeight.bold),
-            unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+            labelStyle: const TextStyle(fontWeight: FontWeight.bold),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.normal),
           ),
           Expanded(
             child: TabBarView(
+              controller: _tabController,
               children: [
                 NursingTab(
                   event: widget.event,
@@ -224,7 +225,6 @@ class _FeedingDialogContentState extends State<FeedingDialogContent>
                   updateEventData: widget.updateEventData,
                 ),
               ],
-              controller: _tabController,
             ),
           )
         ],

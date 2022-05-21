@@ -10,7 +10,7 @@ import 'package:timelines/timelines.dart';
 import 'dart:math';
 
 class ChildStoryPage extends ConsumerWidget {
-  static final routeName = '/child-story';
+  static const routeName = '/child-story';
 
   const ChildStoryPage({Key? key}) : super(key: key);
 
@@ -21,8 +21,8 @@ class ChildStoryPage extends ConsumerWidget {
         ? const CircularProgressIndicator()
         : Scaffold(
             appBar: AppBar(title: Text('${activeChild.name}\'s Story')),
-            drawer: BabyBinderDrawer(),
-            body: ChildStory(),
+            drawer: const BabyBinderDrawer(),
+            body: const ChildStory(),
           );
   }
 }
@@ -62,7 +62,7 @@ class EventButton extends StatelessWidget {
 }
 
 class ChildStory extends ConsumerWidget {
-  ChildStory({
+  const ChildStory({
     Key? key,
   }) : super(key: key);
 
@@ -90,12 +90,12 @@ class ChildStory extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.only(left: 10),
                         constraints:
-                            BoxConstraints(minHeight: 50, maxHeight: 50),
+                            const BoxConstraints(minHeight: 50, maxHeight: 50),
                         child: Center(
                           widthFactor: 1,
                           child: Text(
                             events[index].getTimelineDescription(),
-                            style: TextStyle(fontSize: 14),
+                            style: const TextStyle(fontSize: 14),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -107,12 +107,12 @@ class ChildStory extends ConsumerWidget {
                       child: Container(
                         padding: const EdgeInsets.only(right: 10),
                         constraints:
-                            BoxConstraints(minHeight: 50, maxHeight: 50),
+                            const BoxConstraints(minHeight: 50, maxHeight: 50),
                         child: Center(
                           widthFactor: 1,
                           child: Text(
                             events[index].getFormattedTime(),
-                            style: TextStyle(fontSize: 16),
+                            style: const TextStyle(fontSize: 16),
                           ),
                         ),
                       ),

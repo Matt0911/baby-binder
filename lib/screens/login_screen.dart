@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class LoginScreen extends ConsumerWidget {
-  static final String routeName = '/login-page';
+  static const String routeName = '/login-page';
 
   const LoginScreen({Key? key}) : super(key: key);
 

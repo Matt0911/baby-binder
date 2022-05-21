@@ -18,10 +18,10 @@ class SplashScreen extends StatelessWidget {
       () => onFinished(),
     );
 
-    return Scaffold(
+    return const Scaffold(
       backgroundColor: Colors.teal,
       body: Center(
-        child: const Text(
+        child: Text(
           'Baby Binder',
           style: kTitleDarkTextStyle,
         ),

@@ -6,7 +6,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class ChildSelectionPage extends ConsumerWidget {
-  static final String routeName = '/child-selection-page';
+  static const String routeName = '/child-selection-page';
 
   const ChildSelectionPage({Key? key}) : super(key: key);
 
@@ -17,7 +17,7 @@ class ChildSelectionPage extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Children'),
       ),
-      drawer: BabyBinderDrawer(),
+      drawer: const BabyBinderDrawer(),
       body: Column(
         children: [
           Expanded(
@@ -31,7 +31,7 @@ class ChildSelectionPage extends ConsumerWidget {
                     builder: (BuildContext context) {
                       return Container(
                         width: MediaQuery.of(context).size.width,
-                        margin: EdgeInsets.symmetric(horizontal: 5.0),
+                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
                         child: ChildCard(
                           childData: child,
                         ),
@@ -44,8 +44,8 @@ class ChildSelectionPage extends ConsumerWidget {
             child: TextButton.icon(
                 onPressed: () => print(
                     'add child not yet implemented'), //TODO: implement add child functionality
-                label: Text('Add Child'),
-                icon: Icon(Icons.add)),
+                label: const Text('Add Child'),
+                icon: const Icon(Icons.add)),
           )
         ],
       ),

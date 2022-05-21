@@ -26,7 +26,7 @@ class ChildrenData extends ChangeNotifier {
   _init() async {
     prefs = await Hive.openBox('childrenData');
 
-    if (userData.isLoaded && userData.children.length > 0) {
+    if (userData.isLoaded && userData.children.isNotEmpty) {
       final initialSavedChildId = prefs.get('activeChild');
       _childrenListSubscription = firestore
           .collection('children')
@@ -34,7 +34,7 @@ class ChildrenData extends ChangeNotifier {
           .snapshots()
           .listen(
         (snapshot) {
-          snapshot.docChanges.forEach((docChange) {
+          for (var docChange in snapshot.docChanges) {
             String childId = docChange.doc.id;
             if (docChange.type == DocumentChangeType.added) {
               children.add(childId);
@@ -51,7 +51,7 @@ class ChildrenData extends ChangeNotifier {
               print('modified $docChange');
               _childrenDataMaps[childId] = docChange.doc.data();
             }
-          });
+          }
           notifyListeners();
         },
       );
@@ -74,7 +74,7 @@ class ChildrenData extends ChangeNotifier {
   late Box prefs;
   StreamSubscription<QuerySnapshot>? _childrenListSubscription;
   List<String> children = [];
-  Map<String, Map<String, dynamic>?> _childrenDataMaps = {};
+  final Map<String, Map<String, dynamic>?> _childrenDataMaps = {};
   String? activeChildId;
 }
 

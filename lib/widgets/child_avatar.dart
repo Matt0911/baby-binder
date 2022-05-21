@@ -35,7 +35,7 @@ class ChildAvatar extends StatelessWidget {
                   childName: childName,
                   updateName: updateName,
                 )
-              : SizedBox()
+              : const SizedBox()
         ],
       ),
     );
@@ -66,7 +66,7 @@ class NameDisplay extends StatelessWidget {
                 children: [
                   Text(
                     childName,
-                    style: TextStyle(fontSize: 20, color: kGreyTextColor),
+                    style: const TextStyle(fontSize: 20, color: kGreyTextColor),
                   ),
                   updateName != null
                       ? Positioned(
@@ -89,10 +89,10 @@ class NameDisplay extends StatelessWidget {
                               //   isEditing = !isEditing;
                               // });
                             },
-                            icon: Icon(Icons.edit),
+                            icon: const Icon(Icons.edit),
                           ),
                         )
-                      : SizedBox()
+                      : const SizedBox()
                 ],
               ),
             )
