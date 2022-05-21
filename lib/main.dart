@@ -26,14 +26,14 @@ void main() async {
 }
 
 class BabyBinder extends ConsumerWidget {
-  const BabyBinder({required this.box});
-  final Box box;
+  const BabyBinder({this.box});
+  final Box? box;
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final appState = ref.watch(appStateProvider);
     appState.context = context;
-    final lastPage = box.get('lastPage');
+    final lastPage = box?.get('lastPage');
     return MaterialApp(
       title: 'Baby Binder',
       theme: ThemeData(

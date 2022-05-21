@@ -5,7 +5,6 @@ import 'package:baby_binder/providers/user_data.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_storage/firebase_storage.dart' as firebase_storage;
 
@@ -105,8 +104,6 @@ final childrenListProvider = Provider((ref) {
       .toList();
 });
 
-final DateFormat _formatter = DateFormat();
-
 class Child {
   Child.manual({required String id, required this.name, required this.image})
       : _id = id,
@@ -138,7 +135,6 @@ class Child {
 
   late String name;
   late String image;
-  late bool isSleeping;
 
   DateTime? birthdate;
   bool get isBorn =>

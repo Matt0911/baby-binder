@@ -9,12 +9,11 @@ final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
 final storyDataProvider = ChangeNotifierProvider((ref) {
   final activeChild = ref.watch(activeChildProvider);
-  return StoryData(
-      activeChild?.rawData?['isSleeping'] ?? false, activeChild?.document);
+  return StoryData(activeChild?.document);
 });
 
 class StoryData extends ChangeNotifier {
-  StoryData(this.isSleeping, DocumentReference<Map<String, dynamic>>? document)
+  StoryData(DocumentReference<Map<String, dynamic>>? document)
       : _document = document {
     if (_document != null) {
       _document!.collection('events').orderBy('time').snapshots().listen(
@@ -39,18 +38,19 @@ class StoryData extends ChangeNotifier {
   }
 
   List<StoryEvent> events = [];
-  bool isSleeping = false;
+  bool get isSleeping =>
+      events
+          .firstWhere((e) =>
+              e.eventType == EventType.started_sleeping ||
+              e.eventType == EventType.ended_sleeping)
+          .eventType ==
+      EventType.started_sleeping;
   DocumentReference<Map<String, dynamic>>? _document;
 
   void _addEvent(StoryEvent event) {
     // _events.insert(0, event);
     if (_document != null) {
       _document!.collection('events').add(event.convertToMap());
-      if (event.eventType == EventType.started_sleeping ||
-          event.eventType == EventType.ended_sleeping) {
-        isSleeping = event.eventType == EventType.started_sleeping;
-        _document!.update({'isSleeping': isSleeping});
-      }
     }
   }
 
