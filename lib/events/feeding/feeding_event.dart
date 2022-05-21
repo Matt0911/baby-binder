@@ -75,7 +75,7 @@ class FeedingEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  FeedingEvent.fromData(Map<String, dynamic> data, String id)
+  FeedingEvent.fromData(Map<String, dynamic> data, String? id)
       : type = getFeedingType(data['feedType']),
         left = data['left'] ?? true,
         leftTime = data['leftTime'] ?? 10,
@@ -88,7 +88,7 @@ class FeedingEvent extends StoryEvent {
             : <String>[],
         super(
           eventType: EventType.feeding,
-          eventTime: (data['time'] as Timestamp).toDate(),
+          eventTime: castDate(data['time']),
           id: id,
         );
 

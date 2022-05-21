@@ -38,25 +38,39 @@ class StoryData extends ChangeNotifier {
   StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? listener;
 
   void _initListener() {
-    listener =
-        _document!.collection('events').orderBy('time').snapshots().listen(
-              (snapshot) => snapshot.docChanges.forEach(
-                (docChange) {
-                  if (docChange.type == DocumentChangeType.added) {
-                    events.insert(
-                        0,
-                        createEventFromData(
-                          docChange.doc.data() ?? {},
-                          docChange.doc.id,
-                        ));
-                  } else if (docChange.type == DocumentChangeType.removed) {
-                    // TODO: event edited
-                    events.removeWhere((c) => c.id == docChange.doc.id);
+    listener = _document!
+        .collection('events')
+        .orderBy('time', descending: true)
+        .snapshots()
+        .listen(
+          (snapshot) => snapshot.docChanges.forEach(
+            (docChange) {
+              if (docChange.type == DocumentChangeType.added) {
+                events.add(createEventFromData(
+                  docChange.doc.data() ?? {},
+                  docChange.doc.id,
+                ));
+              } else if (docChange.type == DocumentChangeType.removed) {
+                events.removeWhere((c) => c.id == docChange.doc.id);
+              } else if (docChange.type == DocumentChangeType.modified) {
+                var data = docChange.doc.data();
+                if (data != null) {
+                  int i = events.indexWhere((e) => e.id == docChange.doc.id);
+
+                  StoryEvent orig = events[i];
+                  StoryEvent updated =
+                      createEventFromData(data, docChange.doc.id);
+
+                  events[i] = updated;
+                  if (!orig.eventTime.isAtSameMomentAs(updated.eventTime)) {
+                    events.sort((a, b) => b.eventTime.compareTo(a.eventTime));
                   }
-                  notifyListeners();
-                },
-              ),
-            );
+                }
+              }
+              notifyListeners();
+            },
+          ),
+        );
   }
 
   Future<void> refresh() async {
@@ -116,7 +130,8 @@ class StoryData extends ChangeNotifier {
   }
 
   void editEvent(StoryEvent event, BuildContext context) async {
-    bool eventHasCustomDialog = event.buildDialog != null;
+    StoryEvent clone = cloneEvent(event);
+    bool eventHasCustomDialog = clone.buildDialog != null;
     EventDialogResult? result = await showModalBottomSheet(
       isScrollControlled: true,
       isDismissible: false,
@@ -130,21 +145,21 @@ class StoryData extends ChangeNotifier {
             width: MediaQuery.of(context).size.width,
             height: eventHasCustomDialog ? 400 : 200,
             child: eventHasCustomDialog
-                ? event.buildDialog!(context, isEdit: true)
+                ? clone.buildDialog!(context, isEdit: true)
                 : EventDialog(
-                    title: event.eventType.title,
+                    title: clone.eventType.title,
                     content: (Function(Function()) blank) => SizedBox(),
                     isEdit: true,
-                    event: event,
+                    event: clone,
                   ),
           ),
         ),
       ),
     );
     if (result == EventDialogResult.Save) {
-      _editEvent(event);
+      _editEvent(clone);
     } else if (result == EventDialogResult.Delete) {
-      _deleteEvent(event);
+      _deleteEvent(clone);
     }
   }
 }

@@ -9,10 +9,10 @@ class StartSleepEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  StartSleepEvent.fromData(Map<String, dynamic> data, String id)
+  StartSleepEvent.fromData(Map<String, dynamic> data, String? id)
       : super(
           eventType: EventType.started_sleeping,
-          eventTime: (data['time'] as Timestamp).toDate(),
+          eventTime: castDate(data['time']),
           id: id,
         );
 
@@ -36,10 +36,10 @@ class EndSleepEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  EndSleepEvent.fromData(Map<String, dynamic> data, String id)
+  EndSleepEvent.fromData(Map<String, dynamic> data, String? id)
       : super(
           eventType: EventType.ended_sleeping,
-          eventTime: (data['time'] as Timestamp).toDate(),
+          eventTime: castDate(data['time']),
           id: id,
         );
 

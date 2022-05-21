@@ -83,7 +83,7 @@ class DiaperEvent extends StoryEvent {
           eventTime: DateTime.now(),
         );
 
-  DiaperEvent.fromData(Map<String, dynamic> data, String id)
+  DiaperEvent.fromData(Map<String, dynamic> data, String? id)
       : wet = data['wet'],
         bm = data['bm'],
         cream = data['cream'],
@@ -91,7 +91,7 @@ class DiaperEvent extends StoryEvent {
         note = data['note'],
         super(
           eventType: EventType.diaper,
-          eventTime: (data['time'] as Timestamp).toDate(),
+          eventTime: castDate(data['time']),
           id: id,
         );
 

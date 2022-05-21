@@ -1,9 +1,9 @@
 import 'package:baby_binder/events/diaper_event.dart';
 import 'package:baby_binder/events/feeding/feeding_event.dart';
 import 'package:baby_binder/events/sleep_events.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'event_dialog.dart';
 
 const kDiaperEventKey = 'diaper';
 const kStartedSleepingEventKey = 'started_sleeping';
@@ -124,7 +124,16 @@ abstract class StoryEvent {
       };
 }
 
-StoryEvent createEventFromData(Map<String, dynamic> data, String id) {
+DateTime castDate(dynamic x) {
+  try {
+    return (x as DateTime);
+  } on TypeError catch (e) {
+    print('TypeError when trying to cast $x as DateTime, trying Timestamp');
+    return (x as Timestamp).toDate();
+  }
+}
+
+StoryEvent createEventFromData(Map<String, dynamic> data, String? id) {
   switch (data['type']) {
     case kDiaperEventKey:
       return DiaperEvent.fromData(data, id);
@@ -137,6 +146,10 @@ StoryEvent createEventFromData(Map<String, dynamic> data, String id) {
     default:
       throw Exception('Invalid event type');
   }
+}
+
+StoryEvent cloneEvent(StoryEvent event) {
+  return createEventFromData(event.convertToMap(), event.id);
 }
 
 StoryEvent createEventFromType(EventType type) {
