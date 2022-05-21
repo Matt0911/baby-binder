@@ -79,83 +79,88 @@ class ChildStory extends ConsumerWidget {
             flex: 3,
             child: Padding(
               padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-              child: Timeline.tileBuilder(
-                builder: TimelineTileBuilder.connected(
-                  connectionDirection: ConnectionDirection.after,
-                  contentsAlign: ContentsAlign.basic,
-                  contentsBuilder: (context, index) => Align(
-                    alignment: AlignmentDirectional.topStart,
-                    child: Container(
-                      padding: const EdgeInsets.only(left: 10),
-                      constraints: BoxConstraints(minHeight: 50, maxHeight: 50),
-                      child: Center(
-                        widthFactor: 1,
-                        child: Text(
-                          events[index].getTimelineDescription(),
-                          style: TextStyle(fontSize: 14),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
+              child: RefreshIndicator(
+                onRefresh: story.refresh,
+                child: Timeline.tileBuilder(
+                  builder: TimelineTileBuilder.connected(
+                    connectionDirection: ConnectionDirection.after,
+                    contentsAlign: ContentsAlign.basic,
+                    contentsBuilder: (context, index) => Align(
+                      alignment: AlignmentDirectional.topStart,
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 10),
+                        constraints:
+                            BoxConstraints(minHeight: 50, maxHeight: 50),
+                        child: Center(
+                          widthFactor: 1,
+                          child: Text(
+                            events[index].getTimelineDescription(),
+                            style: TextStyle(fontSize: 14),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  oppositeContentsBuilder: (context, index) => Align(
-                    alignment: AlignmentDirectional.topEnd,
-                    child: Container(
-                      padding: const EdgeInsets.only(right: 10),
-                      constraints: BoxConstraints(minHeight: 50, maxHeight: 50),
-                      child: Center(
-                        widthFactor: 1,
-                        child: Text(
-                          events[index].getFormattedTime(),
-                          style: TextStyle(fontSize: 16),
+                    oppositeContentsBuilder: (context, index) => Align(
+                      alignment: AlignmentDirectional.topEnd,
+                      child: Container(
+                        padding: const EdgeInsets.only(right: 10),
+                        constraints:
+                            BoxConstraints(minHeight: 50, maxHeight: 50),
+                        child: Center(
+                          widthFactor: 1,
+                          child: Text(
+                            events[index].getFormattedTime(),
+                            style: TextStyle(fontSize: 16),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // nodePositionBuilder: (context, index) => 0.4,
-                  // indicatorPositionBuilder: (context, index) => 0.0,
-                  connectorBuilder: (context, index, connectorType) {
-                    if (events[index].eventType == EventType.ended_sleeping) {
-                      duringSleep = true;
-                    } else if (events[index].eventType ==
-                        EventType.started_sleeping) {
-                      duringSleep = false;
-                    }
-                    return SolidLineConnector(
-                      thickness: 6,
-                      space: 40,
-                      color: duringSleep ? Colors.green : Colors.blue,
-                    );
-                  },
-                  itemExtentBuilder: (context, index) {
-                    const double base = 60;
-                    if (index == events.length - 1) return base;
+                    // nodePositionBuilder: (context, index) => 0.4,
+                    // indicatorPositionBuilder: (context, index) => 0.0,
+                    connectorBuilder: (context, index, connectorType) {
+                      if (events[index].eventType == EventType.ended_sleeping) {
+                        duringSleep = true;
+                      } else if (events[index].eventType ==
+                          EventType.started_sleeping) {
+                        duringSleep = false;
+                      }
+                      return SolidLineConnector(
+                        thickness: 6,
+                        space: 40,
+                        color: duringSleep ? Colors.green : Colors.blue,
+                      );
+                    },
+                    itemExtentBuilder: (context, index) {
+                      const double base = 60;
+                      if (index == events.length - 1) return base;
 
-                    DateTime curTime = events[index].getLocalTime();
-                    DateTime prevTime = events[index + 1].getLocalTime();
-                    int diff = curTime.difference(prevTime).inMinutes;
-                    double scaled = min((diff <= 0 ? 1 : diff) / 2, 250);
-                    return base + scaled;
-                  },
-                  indicatorPositionBuilder: (context, index) => 0,
-                  indicatorBuilder: (context, index) {
-                    EventType type = events[index].eventType;
-                    return GestureDetector(
-                      onLongPress: () =>
-                          story.editEvent(events[index], context),
-                      child: DotIndicator(
-                        color: type.iconColor,
-                        size: 50,
-                        child: Icon(
-                          type.icon,
-                          color: type.backgroundColor,
-                          size: 30,
+                      DateTime curTime = events[index].getLocalTime();
+                      DateTime prevTime = events[index + 1].getLocalTime();
+                      int diff = curTime.difference(prevTime).inMinutes;
+                      double scaled = min((diff <= 0 ? 1 : diff) / 2, 250);
+                      return base + scaled;
+                    },
+                    indicatorPositionBuilder: (context, index) => 0,
+                    indicatorBuilder: (context, index) {
+                      EventType type = events[index].eventType;
+                      return GestureDetector(
+                        onLongPress: () =>
+                            story.editEvent(events[index], context),
+                        child: DotIndicator(
+                          color: type.iconColor,
+                          size: 50,
+                          child: Icon(
+                            type.icon,
+                            color: type.backgroundColor,
+                            size: 30,
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  itemCount: events.length,
+                      );
+                    },
+                    itemCount: events.length,
+                  ),
                 ),
               ),
             )),

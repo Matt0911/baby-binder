@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:baby_binder/events/event_dialog.dart';
 import 'package:baby_binder/events/sleep_events.dart';
 import 'package:baby_binder/events/story_events.dart';
@@ -17,24 +19,7 @@ class StoryData extends ChangeNotifier {
   StoryData(DocumentReference<Map<String, dynamic>>? document)
       : _document = document {
     if (_document != null) {
-      _document!.collection('events').orderBy('time').snapshots().listen(
-            (snapshot) => snapshot.docChanges.forEach(
-              (docChange) {
-                if (docChange.type == DocumentChangeType.added) {
-                  events.insert(
-                      0,
-                      createEventFromData(
-                        docChange.doc.data() ?? {},
-                        docChange.doc.id,
-                      ));
-                } else if (docChange.type == DocumentChangeType.removed) {
-                  // TODO: event edited
-                  events.removeWhere((c) => c.id == docChange.doc.id);
-                }
-                notifyListeners();
-              },
-            ),
-          );
+      _initListener();
     }
   }
 
@@ -50,6 +35,35 @@ class StoryData extends ChangeNotifier {
           .eventType ==
       EventType.started_sleeping;
   DocumentReference<Map<String, dynamic>>? _document;
+  StreamSubscription<QuerySnapshot<Map<String, dynamic>>>? listener;
+
+  void _initListener() {
+    listener =
+        _document!.collection('events').orderBy('time').snapshots().listen(
+              (snapshot) => snapshot.docChanges.forEach(
+                (docChange) {
+                  if (docChange.type == DocumentChangeType.added) {
+                    events.insert(
+                        0,
+                        createEventFromData(
+                          docChange.doc.data() ?? {},
+                          docChange.doc.id,
+                        ));
+                  } else if (docChange.type == DocumentChangeType.removed) {
+                    // TODO: event edited
+                    events.removeWhere((c) => c.id == docChange.doc.id);
+                  }
+                  notifyListeners();
+                },
+              ),
+            );
+  }
+
+  Future<void> refresh() async {
+    events = [];
+    await listener?.cancel();
+    _initListener();
+  }
 
   void _addEvent(StoryEvent event) {
     // _events.insert(0, event);
