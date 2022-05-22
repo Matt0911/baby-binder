@@ -25,7 +25,7 @@ class StoryData extends ChangeNotifier {
 
   List<StoryEvent> events = [];
   bool get isSleeping =>
-      events
+      events.reversed
           .firstWhere(
             (e) =>
                 e.eventType == EventType.started_sleeping ||
