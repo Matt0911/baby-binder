@@ -94,7 +94,8 @@ class ChildStory extends ConsumerWidget {
                         child: Center(
                           widthFactor: 1,
                           child: Text(
-                            events[index].getTimelineDescription(),
+                            events[events.length - 1 - index]
+                                .getTimelineDescription(),
                             style: const TextStyle(fontSize: 14),
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
@@ -111,7 +112,8 @@ class ChildStory extends ConsumerWidget {
                         child: Center(
                           widthFactor: 1,
                           child: Text(
-                            events[index].getFormattedTime(),
+                            events[events.length - 1 - index]
+                                .getFormattedTime(),
                             style: const TextStyle(fontSize: 16),
                           ),
                         ),
@@ -120,9 +122,10 @@ class ChildStory extends ConsumerWidget {
                     // nodePositionBuilder: (context, index) => 0.4,
                     // indicatorPositionBuilder: (context, index) => 0.0,
                     connectorBuilder: (context, index, connectorType) {
-                      if (events[index].eventType == EventType.ended_sleeping) {
+                      if (events[events.length - 1 - index].eventType ==
+                          EventType.ended_sleeping) {
                         duringSleep = true;
-                      } else if (events[index].eventType ==
+                      } else if (events[events.length - 1 - index].eventType ==
                           EventType.started_sleeping) {
                         duringSleep = false;
                       }
@@ -136,18 +139,21 @@ class ChildStory extends ConsumerWidget {
                       const double base = 60;
                       if (index == events.length - 1) return base;
 
-                      DateTime curTime = events[index].getLocalTime();
-                      DateTime prevTime = events[index + 1].getLocalTime();
+                      DateTime curTime =
+                          events[events.length - 1 - index].getLocalTime();
+                      DateTime prevTime =
+                          events[events.length - 2 - index].getLocalTime();
                       int diff = curTime.difference(prevTime).inMinutes;
                       double scaled = min((diff <= 0 ? 1 : diff) / 2, 250);
                       return base + scaled;
                     },
                     indicatorPositionBuilder: (context, index) => 0,
                     indicatorBuilder: (context, index) {
-                      EventType type = events[index].eventType;
+                      EventType type =
+                          events[events.length - 1 - index].eventType;
                       return GestureDetector(
-                        onLongPress: () =>
-                            story.editEvent(events[index], context),
+                        onLongPress: () => story.editEvent(
+                            events[events.length - 1 - index], context),
                         child: DotIndicator(
                           color: type.iconColor,
                           size: 50,

@@ -40,37 +40,34 @@ class StoryData extends ChangeNotifier {
   void _initListener() {
     listener = _document!
         .collection('events')
-        .orderBy('time', descending: true)
+        .orderBy('time')
         .snapshots()
-        .listen(
-          (snapshot) => snapshot.docChanges.forEach(
-            (docChange) {
-              if (docChange.type == DocumentChangeType.added) {
-                events.add(createEventFromData(
-                  docChange.doc.data() ?? {},
-                  docChange.doc.id,
-                ));
-              } else if (docChange.type == DocumentChangeType.removed) {
-                events.removeWhere((c) => c.id == docChange.doc.id);
-              } else if (docChange.type == DocumentChangeType.modified) {
-                var data = docChange.doc.data();
-                if (data != null) {
-                  int i = events.indexWhere((e) => e.id == docChange.doc.id);
+        .listen((snapshot) {
+      for (var docChange in snapshot.docChanges) {
+        if (docChange.type == DocumentChangeType.added) {
+          events.add(createEventFromData(
+            docChange.doc.data() ?? {},
+            docChange.doc.id,
+          ));
+        } else if (docChange.type == DocumentChangeType.removed) {
+          events.removeWhere((c) => c.id == docChange.doc.id);
+        } else if (docChange.type == DocumentChangeType.modified) {
+          var data = docChange.doc.data();
+          if (data != null) {
+            int i = events.indexWhere((e) => e.id == docChange.doc.id);
 
-                  StoryEvent orig = events[i];
-                  StoryEvent updated =
-                      createEventFromData(data, docChange.doc.id);
+            StoryEvent orig = events[i];
+            StoryEvent updated = createEventFromData(data, docChange.doc.id);
 
-                  events[i] = updated;
-                  if (!orig.eventTime.isAtSameMomentAs(updated.eventTime)) {
-                    events.sort((a, b) => b.eventTime.compareTo(a.eventTime));
-                  }
-                }
-              }
-              notifyListeners();
-            },
-          ),
-        );
+            events[i] = updated;
+            if (!orig.eventTime.isAtSameMomentAs(updated.eventTime)) {
+              events.sort((a, b) => a.eventTime.compareTo(b.eventTime));
+            }
+          }
+        }
+        notifyListeners();
+      }
+    });
   }
 
   Future<void> refresh() async {
